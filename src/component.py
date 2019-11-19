@@ -158,8 +158,9 @@ class Component(KBCEnvHandler):
         base_header = {
             'Authorization': 'Zoho-oauthtoken {}'.format(token)
         }
+        MoreData = True
 
-        while True:
+        while MoreData:
             parameters = {'page': pages}
             if self.load_mode == 'incremental':
                 base_header['If-Modified_Since'] = lon_time

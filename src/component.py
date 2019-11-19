@@ -158,9 +158,8 @@ class Component(KBCEnvHandler):
         base_header = {
             'Authorization': 'Zoho-oauthtoken {}'.format(token)
         }
-        MoreData = True
 
-        while MoreData:
+        while True:
             parameters = {'page': pages}
             if self.load_mode == 'incremental':
                 base_header['If-Modified_Since'] = lon_time
@@ -169,7 +168,7 @@ class Component(KBCEnvHandler):
             if res.status_code != 304:
                 res_data = res.json()
 
-                if res_data['info']['more_records'] == True:
+                if res_data['info']['more_records'] is True:
                     final_df = final_df.append(
                         json_normalize(res_data['data']))
                 else:

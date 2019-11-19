@@ -1,0 +1,64 @@
+{
+    "title": "Zoho CRM API (v2)",
+    "type": "object",
+    "required": [
+        "region",
+        "#refresh_token",
+        "client_id",
+        "#client_secret",
+        "load_mode"
+    ],
+    "properties": {
+        "region": {
+            "title": "Zoho Account Region",
+            "type": "string",
+            "enum": [
+                "https://accounts.zoho.com",
+                "https://accounts.zoho.eu",
+                "https://accounts.zoho.com.cn",
+                "https://accounts.zoho.in"
+            ],
+            "options": {
+                "enum_titles": [
+                    "US",
+                    "EU",
+                    "CN",
+                    "IN"
+                ]
+            },
+            "default": "https://accounts.zoho.eu",
+            "propertyOrder": 1
+        },
+        "#refresh_token": {
+            "title": "Account's Refresh Token",
+            "type": "string",
+            "propertyOrder": 2
+        },
+        "client_id": {
+            "title": "Account's Client ID",
+            "type": "string",
+            "propertyOrder": 3
+        },
+        "#client_secret": {
+            "title": "Account's Client Secret",
+            "type": "string",
+            "propertyOrder": 4
+        },
+        "load_mode": {
+            "title": "Load Mode",
+            "type": "string",
+            "enum": [
+                "full",
+                "incremental"
+            ],
+            "options": {
+                "enum_titles": [
+                    "Full",
+                    "Incremental"
+                ]
+            },
+            "default": "Full",
+            "propertyOrder": 5
+        }
+    }
+}

@@ -11,7 +11,7 @@ import os
 
 from datetime import datetime, timedelta
 import pytz
-import json
+import json  # noqa
 import requests
 import pandas as pd
 import time  # noqa
@@ -153,7 +153,7 @@ class Component(KBCEnvHandler):
         '''
 
         lon_time = self.ex_time
-        output_df = pd.DataFrame()
+        final_df = pd.DataFrame()
         pages = 1
         base_header = {
             'Authorization': 'Zoho-oauthtoken {}'.format(token)
@@ -185,7 +185,7 @@ class Component(KBCEnvHandler):
                                                            module), params=parameters, headers=tmp_header)
                 res_data = res.json()
                 final_df = final_df.append(
-                    json_normalize(req_response['data']))
+                    json_normalize(res_data['data']))
                 final_df = final_df.iloc[0:0]
                 final_df = self.column_validation(token, module, final_df)
 

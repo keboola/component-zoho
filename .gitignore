@@ -9,8 +9,8 @@ __pycache__/
 .devcontainer
 
 # kbc datafolder
-/data
-/venv
+data
+venv
 
 # kcf-tools
 generated

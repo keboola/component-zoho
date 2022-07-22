@@ -3,3 +3,5 @@ keboola.utils
 keboola.http-client
 mock
 freezegun
+zohocrmsdk2_0
+mysql-connector-python

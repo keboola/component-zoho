@@ -1,51 +1,52 @@
 {
-    "title": "Zoho CRM API (v2)",
+    "title": "Zoho CRM API (v2) configuration",
     "type": "object",
     "required": [
-        "region",
-        "#refresh_token",
+        "region_code",
         "client_id",
         "#client_secret",
+        "#grant_token",
+        "user_email",
         "load_mode"
     ],
     "properties": {
-        "region": {
-            "title": "Zoho Account Region",
+        "region_code": {
+            "title": "Zoho account region code",
             "type": "string",
             "enum": [
-                "https://accounts.zoho.com",
-                "https://accounts.zoho.eu",
-                "https://accounts.zoho.com.cn",
-                "https://accounts.zoho.in"
+                "EU",
+                "US",
+                "CN",
+                "IN",
+                "AU",
+                "JP"
             ],
-            "options": {
-                "enum_titles": [
-                    "US",
-                    "EU",
-                    "CN",
-                    "IN"
-                ]
-            },
-            "default": "https://accounts.zoho.eu",
+            "default": "EU",
             "propertyOrder": 1
         },
-        "#refresh_token": {
-            "title": "Account's Refresh Token",
+        "client_id": {
+            "title": "Account's client ID",
             "type": "string",
             "propertyOrder": 2
         },
-        "client_id": {
-            "title": "Account's Client ID",
+        "#client_secret": {
+            "title": "Account's client secret",
             "type": "string",
             "propertyOrder": 3
         },
-        "#client_secret": {
-            "title": "Account's Client Secret",
+        "#grant_token": {
+            "title": "Account's grant token",
             "type": "string",
             "propertyOrder": 4
         },
+        "user_email": {
+            "title": "Account's user email",
+            "type": "string",
+            "format": "email",
+            "propertyOrder": 5
+        },
         "load_mode": {
-            "title": "Load Mode",
+            "title": "Load mode",
             "type": "string",
             "enum": [
                 "full",
@@ -57,8 +58,8 @@
                     "Incremental"
                 ]
             },
-            "default": "Full",
-            "propertyOrder": 5
+            "default": "full",
+            "propertyOrder": 6
         }
     }
 }

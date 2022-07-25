@@ -1,15 +1,43 @@
 from pathlib import Path
+from typing import Literal
 
 from zcrmsdk.src.com.zoho.crm.api.user_signature import UserSignature
-from zcrmsdk.src.com.zoho.crm.api.dc import EUDataCenter
+from zcrmsdk.src.com.zoho.crm.api.dc import (
+    EUDataCenter,
+    USDataCenter,
+    CNDataCenter,
+    INDataCenter,
+    AUDataCenter,
+    JPDataCenter,
+    DataCenter,
+)
 from zcrmsdk.src.com.zoho.api.authenticator.store import FileStore
 from zcrmsdk.src.com.zoho.api.logger import Logger
 from zcrmsdk.src.com.zoho.crm.api.initializer import Initializer
 from zcrmsdk.src.com.zoho.api.authenticator.oauth_token import OAuthToken
 from zcrmsdk.src.com.zoho.crm.api.sdk_config import SDKConfig
 
-# Constants
+# Constants # TODO: validate and move elsewhere
 SCOPE = "ZohoCRM.modules.all,ZohoCRM.users.all,ZohoCRM.org.all,ZohoCRM.settings.all,AAAServer.profile.READ"
+
+
+def code_to_dc(code: str) -> DataCenter:
+    if code == "EU":
+        return EUDataCenter.PRODUCTION()
+    elif code == "US":
+        return USDataCenter.PRODUCTION()
+    elif code == "CN":
+        return CNDataCenter.PRODUCTION()
+    elif code == "IN":
+        return INDataCenter.PRODUCTION()
+    elif code == "AU":
+        return AUDataCenter.PRODUCTION()
+    elif code == "JP":
+        return JPDataCenter.PRODUCTION()
+    else:
+        raise ValueError(
+            "Invalid data center code, must be one of EU, US, CN, IN, AU, JP."
+        )
 
 
 def set_filestore_file(file_store_path: Path, content: str):
@@ -20,7 +48,15 @@ def get_filestore_file(file_store_path: Path):
     return file_store_path.read_text()
 
 
-def initialize(tmp_dir_path: Path, file_store_path: Path):
+def initialize(
+    region_code: Literal["EU", "US", "CN", "IN", "AU", "JP"],
+    client_id: str,
+    client_secret: str,
+    grant_token: str,
+    user_email: str,
+    tmp_dir_path: Path,
+    file_store_path: Path,
+):
 
     """
     Create an instance of Logger Class that takes two parameters
@@ -34,7 +70,7 @@ def initialize(tmp_dir_path: Path, file_store_path: Path):
     )
 
     # Create an UserSignature instance that takes user Email as parameter
-    user = UserSignature(email="david@keboola.com")
+    user = UserSignature(email=user_email)
 
     """
         Configure the environment
@@ -42,7 +78,7 @@ def initialize(tmp_dir_path: Path, file_store_path: Path):
         Available Domains: USDataCenter, EUDataCenter, INDataCenter, CNDataCenter, AUDataCenter
         Available Environments: PRODUCTION(), DEVELOPER(), SANDBOX()
         """
-    environment = EUDataCenter.PRODUCTION()
+    environment = code_to_dc(region_code)
 
     """
         Create a Token instance that takes the following parameters
@@ -54,9 +90,9 @@ def initialize(tmp_dir_path: Path, file_store_path: Path):
         6 ->> id
         """
     token = OAuthToken(
-        client_id="1000.RTGRY0WVJYYN0WBJIJL47U4XQL9F4K",
-        client_secret="c3f4c289e734c97cf6e12d708726649873cefb0850",
-        grant_token="1000.099143ff1b650399ea45f022d712d8dd.3305396c1ebe5a8527176e395dc43999",
+        client_id=client_id,
+        client_secret=client_secret,
+        grant_token=grant_token,
         # refresh_token="refresh_token",
         # redirect_url="redirectURL",
         # id="id",

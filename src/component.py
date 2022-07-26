@@ -5,24 +5,29 @@ Template Component main class.
 # import csv
 import logging
 from pathlib import Path
-from typing import Literal
+from typing import List, Literal
 
 # from datetime import datetime
-# import os
+import os
 
 from keboola.component.base import ComponentBase
 from keboola.component.exceptions import UserException
 
 import zoho.initialization
 import zoho.users
+import zoho.bulk_read
 
-# configuration variables
+# Configuration variables
 KEY_REGION_CODE = "region_code"
 KEY_CLIENT_ID = "client_id"
 KEY_CLIENT_SECRET = "#client_secret"
 KEY_GRANT_TOKEN = "#grant_token"
 KEY_USER_EMAIL = "user_email"
 KEY_LOAD_MODE = "load_mode"
+
+# Row configuration variables
+KEY_MODULE_NAME = "module_name"
+KEY_FIELD_NAMES = "field_names"
 
 # list of mandatory parameters => if some is missing,
 # component will fail with readable message on initialization.
@@ -33,6 +38,7 @@ REQUIRED_PARAMETERS = [
     KEY_GRANT_TOKEN,
     KEY_USER_EMAIL,
     KEY_LOAD_MODE,
+    KEY_MODULE_NAME,
 ]
 REQUIRED_IMAGE_PARS = []
 
@@ -74,6 +80,10 @@ class Component(ComponentBase):
         grant_token: str = params[KEY_GRANT_TOKEN]
         user_email: str = params[KEY_USER_EMAIL]
         load_mode: Literal["full", "incremental"] = params[KEY_LOAD_MODE]
+        module_name: str = params[KEY_MODULE_NAME]
+        field_names: List[str] = params.get(KEY_FIELD_NAMES, [])
+
+        incremental: bool = load_mode == "incremental"
 
         # Create directory for temporary data (Zoho SDK logging and token store)
         data_dir_path = Path(self.data_folder_path)
@@ -99,28 +109,25 @@ class Component(ComponentBase):
         )
         self.save_state()  # TODO?: Probably just save at the end - this is only any useful in dev
 
-        zoho.users.get_users()
-        # ####### EXAMPLE TO REMOVE
-        # # Create output table (Tabledefinition - just metadata)
-        # table = self.create_out_table_definition(
-        #     "output.csv", incremental=True, primary_key=["timestamp"]
-        # )
+        table_def = self.create_out_table_definition(
+            name=f"{module_name}.csv",
+            incremental=incremental,
+            primary_key=["Id"],
+            is_sliced=True,
+        )
 
-        # # get file path of the table (data/out/tables/Features.csv)
-        # out_table_path = table.full_path
-        # logging.info(out_table_path)
+        os.makedirs(table_def.full_path, exist_ok=True)
+        bulk_read_job = zoho.bulk_read.BulkReadJobBatch(
+            module_api_name=module_name,
+            destination_folder=table_def.full_path,
+            file_name=table_def.name,
+            field_names=field_names,
+        )
+        bulk_read_job.download_all_pages()
 
-        # os.makedirs(self.tables_out_path, exist_ok=True)
-        # # DO whatever and save into out_table_path
-        # with open(table.full_path, mode="wt", encoding="utf-8", newline="") as out_file:
-        #     writer = csv.DictWriter(out_file, fieldnames=["timestamp"])
-        #     writer.writeheader()
-        #     writer.writerow({"timestamp": datetime.now().isoformat()})
+        table_def.columns = bulk_read_job.field_names
+        self.write_manifest(table_def)
 
-        # # Save table manifest (output.csv.manifest) from the tabledefinition
-        # self.write_manifest(table)
-
-        # ####### EXAMPLE TO REMOVE END
         self.save_state()
 
     def save_state(self):

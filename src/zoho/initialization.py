@@ -18,7 +18,8 @@ from zcrmsdk.src.com.zoho.api.authenticator.oauth_token import OAuthToken
 from zcrmsdk.src.com.zoho.crm.api.sdk_config import SDKConfig
 
 # Constants # TODO: validate and move elsewhere
-SCOPE = "ZohoCRM.modules.all,ZohoCRM.users.all,ZohoCRM.org.all,ZohoCRM.settings.all,AAAServer.profile.READ"
+# SCOPE = "ZohoCRM.modules.all,ZohoCRM.users.all,ZohoCRM.org.all,ZohoCRM.settings.all,AAAServer.profile.READ"
+# Actually needed: ZohoCRM.modules.READ,ZohoCRM.bulk.READ
 
 
 def code_to_dc(code: str) -> DataCenter:

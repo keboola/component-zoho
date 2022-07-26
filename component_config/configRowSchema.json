@@ -1,0 +1,24 @@
+{
+    "title": "Zoho CRM API (v2) row configuration",
+    "type": "object",
+    "required": [
+        "module_name"
+    ],
+    "properties": {
+        "module_name": {
+            "title": "Module name",
+            "type": "string",
+            "propertyOrder": 1
+        },
+        "field_names": {
+            "title": "Field names",
+            "description": "List of field names to be downloaded",
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "uniqueItems": true,
+            "propertyOrder": 2
+        }
+    }
+}

@@ -25,20 +25,20 @@ from zcrmsdk.src.com.zoho.crm.api.util import APIResponse
 POLLING_PERIOD_SECONDS = 8
 
 
-def print_criteria(criteria: Criteria):
+def print_criteria(criteria: Criteria):  # TODO: change to str generating function
     if criteria.get_api_name() is not None:
         # Get the API Name of the Criteria
-        logging.info("BulkRead Criteria API Name: " + criteria.get_api_name())
+        logging.debug("BulkRead Criteria API Name: " + criteria.get_api_name())
 
     if criteria.get_comparator() is not None:
         # Get the Comparator of the Criteria
-        logging.info(
+        logging.debug(
             "BulkRead Criteria Comparator: " + criteria.get_comparator().get_value()
         )
 
     if criteria.get_value() is not None:
         # Get the Value of the Criteria
-        logging.info("BulkRead Criteria Value: " + str(criteria.get_value()))
+        logging.debug("BulkRead Criteria Value: " + str(criteria.get_value()))
 
     # Get the List of Criteria instance of each Criteria
     criteria_group = criteria.get_group()
@@ -49,10 +49,41 @@ def print_criteria(criteria: Criteria):
 
     if criteria.get_group_operator() is not None:
         # Get the Group Operator of the Criteria
-        logging.info(
+        logging.debug(
             "BulkRead Criteria Group Operator: "
             + criteria.get_group_operator().get_value()
         )
+
+
+def handle_api_exception(api_exception: APIException):
+    # Get the Status
+    logging.debug("Status: " + api_exception.get_status().get_value())
+
+    # Get the Code
+    logging.debug("Code: " + api_exception.get_code().get_value())
+
+    logging.debug("Details")
+
+    # Get the details dict
+    details = api_exception.get_details()
+
+    details_string = ""
+    for key, value in details.items():
+        msg = " " + key + ": " + str(value)
+        details_string = details_string + "\n" + msg
+    logging.debug(details_string)
+
+    # Get the Message
+    logging.debug("Message: " + api_exception.get_message().get_value())
+
+    # Raise an exception
+    raise RuntimeError(
+        f"API did not accept the request to get details of a bulk read job.\n"
+        f"Status: {api_exception.get_status().get_value()}\n"
+        f"Code: {api_exception.get_code().get_value()}\n"
+        f"Message: {api_exception.get_message().get_value()}\n"
+        f"Details: {details_string}"
+    )
 
 
 @dataclass(slots=True)
@@ -112,9 +143,6 @@ class BulkReadJobBatch:
         # Specifies the unique ID of the custom view, whose records you want to export.
         # query.set_cvid('3409643000000087501')
 
-        # # List of field names
-        # field_api_names = ["Last_Name"]
-
         # Specifies the API Name of the fields to be fetched
         if self.field_names:
             query.set_fields(self.field_names)
@@ -148,93 +176,73 @@ class BulkReadJobBatch:
         # Call create_bulk_read_job method that takes RequestWrapper instance as parameter
         response: APIResponse = bulk_read_operations.create_bulk_read_job(request)
 
-        if response is not None:
-            # Get the status code from response
-            logging.info("Status Code: " + str(response.get_status_code()))
+        if response is None:
+            raise RuntimeError(
+                "Got no response from API when attempting to create a bulk read job."
+            )
 
-            # Get object from response
-            response_object = response.get_object()
+        # Get the status code from response
+        logging.debug("Status Code: " + str(response.get_status_code()))
 
-            if response_object is not None:
+        # Get object from response
+        response_object = response.get_object()
 
-                # Check if expected ActionWrapper instance is received.
-                if isinstance(response_object, ActionWrapper):
-                    action_response_list = response_object.get_data()
+        if response_object is None:
+            raise RuntimeError(
+                "Got no or empty response object from API when attempting to create a bulk read job."
+            )
 
-                    for action_response in action_response_list:
-
-                        # Check if the request is successful
-                        if isinstance(action_response, SuccessResponse):
-                            # Get the Status
-                            logging.info(
-                                "Status: " + action_response.get_status().get_value()
-                            )
-
-                            # Get the Code
-                            logging.info(
-                                "Code: " + action_response.get_code().get_value()
-                            )
-
-                            logging.info("Details")
-
-                            # Get the details dict
-                            details = action_response.get_details()
-
-                            for key, value in details.items():
-                                logging.info(key + " : " + str(value))
-
-                            self._current_job_id = details["id"]
-
-                            # Get the Message
-                            logging.info(
-                                "Message: " + action_response.get_message().get_value()
-                            )
-
-                        # Check if the request returned an exception
-                        elif isinstance(action_response, APIException):
-                            # Get the Status
-                            logging.info(
-                                "Status: " + action_response.get_status().get_value()
-                            )
-
-                            # Get the Code
-                            logging.info(
-                                "Code: " + action_response.get_code().get_value()
-                            )
-
-                            logging.info("Details")
-
-                            # Get the details dict
-                            details = action_response.get_details()
-
-                            for key, value in details.items():
-                                logging.info(key + " : " + str(value))
-
-                            # Get the Message
-                            logging.info(
-                                "Message: " + action_response.get_message().get_value()
-                            )
-
-                # Check if the request returned an exception
-                elif isinstance(response_object, APIException):
+        # Check if expected ActionWrapper instance is received.
+        if isinstance(response_object, ActionWrapper):
+            action_response_list = response_object.get_data()
+            for action_response in action_response_list:
+                # Check if the request is successful
+                if isinstance(action_response, SuccessResponse):
                     # Get the Status
-                    logging.info("Status: " + response_object.get_status().get_value())
+                    logging.debug("Status: " + action_response.get_status().get_value())
 
                     # Get the Code
-                    logging.info("Code: " + response_object.get_code().get_value())
+                    logging.debug("Code: " + action_response.get_code().get_value())
 
-                    logging.info("Details")
+                    logging.debug("Details")
 
                     # Get the details dict
-                    details = response_object.get_details()
+                    details = action_response.get_details()
 
                     for key, value in details.items():
-                        logging.info(key + " : " + str(value))
+                        logging.debug(key + " : " + str(value))
+
+                    self._current_job_id = details["id"]
 
                     # Get the Message
-                    logging.info(
-                        "Message: " + response_object.get_message().get_value()
+                    logging.debug(
+                        "Message: " + action_response.get_message().get_value()
                     )
+
+                # Check if the request returned an exception
+                elif isinstance(action_response, APIException):
+                    # Get the Status
+                    logging.debug("Status: " + action_response.get_status().get_value())
+
+                    # Get the Code
+                    logging.debug("Code: " + action_response.get_code().get_value())
+
+                    logging.debug("Details")
+
+                    # Get the details dict
+                    details = action_response.get_details()
+
+                    for key, value in details.items():
+                        logging.debug(key + " : " + str(value))
+
+                    # Get the Message
+                    logging.debug(
+                        "Message: " + action_response.get_message().get_value()
+                    )
+
+        # Check if the request returned an exception
+        elif isinstance(response_object, APIException):
+            handle_api_exception(response_object)
 
     def get_details(self):
         # Get instance of BulkReadOperations Class
@@ -244,160 +252,124 @@ class BulkReadJobBatch:
         response: APIResponse = bulk_read_operations.get_bulk_read_job_details(
             self._current_job_id
         )
+        if response is None:
+            raise RuntimeError(
+                "Got no response from API when attempting to get details of a bulk read job."
+            )
 
-        if response is not None:
+        # Get the status code from response
+        logging.debug("Status Code: " + str(response.get_status_code()))
 
-            # Get the status code from response
-            logging.info("Status Code: " + str(response.get_status_code()))
+        # if response.get_status_code() in [204, 304]:
+        #     logging.debug(
+        #         "No Content" if response.get_status_code() == 204 else "Not Modified"
+        #     )
+        #     return
 
-            if response.get_status_code() in [204, 304]:
-                logging.info(
-                    "No Content"
-                    if response.get_status_code() == 204
-                    else "Not Modified"
-                )
-                return
+        # Get object from response
+        response_object = response.get_object()
 
-            # Get object from response
-            response_object = response.get_object()
+        if response_object is None:
+            raise RuntimeError(
+                "Got no or empty response object from API when attempting to get details of a bulk read job."
+            )
 
-            if response_object is not None:
+        # Check if expected ResponseWrapper instance is received
+        if isinstance(response_object, ResponseWrapper):
 
-                # Check if expected ResponseWrapper instance is received
-                if isinstance(response_object, ResponseWrapper):
+            # Get the list of JobDetail instances
+            job_details_list: List[JobDetail] = response_object.get_data()
 
-                    # Get the list of JobDetail instances
-                    job_details_list: List[JobDetail] = response_object.get_data()
+            for job_detail in job_details_list:
+                # Get the Job ID of each jobDetail
+                logging.debug("Bulk read Job ID: " + str(job_detail.get_id()))
 
-                    for job_detail in job_details_list:
-                        # Get the Job ID of each jobDetail
-                        logging.info("Bulk read Job ID: " + str(job_detail.get_id()))
+                # Get the Operation of each jobDetail
+                logging.debug("Bulk read Operation: " + job_detail.get_operation())
 
-                        # Get the Operation of each jobDetail
-                        logging.info(
-                            "Bulk read Operation: " + job_detail.get_operation()
-                        )
+                # Get the State of each jobDetail
+                logging.debug("Bulk read State: " + job_detail.get_state().get_value())
+                self._current_job_state = job_detail.get_state().get_value()
 
-                        # Get the State of each jobDetail
-                        logging.info(
-                            "Bulk read State: " + job_detail.get_state().get_value()
-                        )
-                        self._current_job_state = job_detail.get_state().get_value()
+                # Get the Result instance of each jobDetail
+                result = job_detail.get_result()
 
-                        # Get the Result instance of each jobDetail
-                        result = job_detail.get_result()
+                if result is not None:
+                    # Get the Page of the Result
+                    logging.debug("Bulkread Result Page: " + str(result.get_page()))
 
-                        if result is not None:
-                            # Get the Page of the Result
-                            logging.info(
-                                "Bulkread Result Page: " + str(result.get_page())
-                            )
+                    # Get the Count of the Result
+                    logging.debug("Bulkread Result Count: " + str(result.get_count()))
 
-                            # Get the Count of the Result
-                            logging.info(
-                                "Bulkread Result Count: " + str(result.get_count())
-                            )
-
-                            # Get the Download URL of the Result
-                            logging.info(
-                                "Bulkread Result Download URL: "
-                                + result.get_download_url()
-                            )
-
-                            # Get the Per_Page of the Result
-                            logging.info(
-                                "Bulkread Result Per_Page: "
-                                + str(result.get_per_page())
-                            )
-
-                            # Get the MoreRecords of the Result
-                            logging.info(
-                                "Bulkread Result MoreRecords: "
-                                + str(result.get_more_records())
-                            )
-                            self._more_pages = result.get_more_records()
-
-                        # Get the Query instance of each jobDetail
-                        query = job_detail.get_query()
-
-                        if query is not None:
-                            # Get the Module Name of the Query
-                            logging.info(
-                                "Bulk read Query Module: " + query.get_module()
-                            )
-
-                            # Get the Page of the Query
-                            logging.info(
-                                "Bulk read Query Page: " + str(query.get_page())
-                            )
-
-                            # Get the cvid of the Query
-                            logging.info(
-                                "Bulk read Query cvid: " + str(query.get_cvid())
-                            )
-
-                            # Get the fields List of the Query
-                            fields = query.get_fields()
-
-                            if fields is not None:
-                                logging.info("Bulk read fields")
-                                for field in fields:
-                                    logging.info(field)
-
-                            # Get the Criteria instance of the Query
-                            criteria = query.get_criteria()
-
-                            if criteria is not None:
-                                print_criteria(criteria)
-
-                            # Get the CreatedBy User instance of each jobDetail
-                            created_by = job_detail.get_created_by()
-
-                            # Check if created_by is not None
-                            if created_by is not None:
-                                # Get the Name of the created_by User
-                                logging.info(
-                                    "Bulkread Created By - Name: "
-                                    + created_by.get_name()
-                                )
-
-                                # Get the ID of the created_by User
-                                logging.info(
-                                    "Bulkread Created By - ID: "
-                                    + str(created_by.get_id())
-                                )
-
-                            # Get the CreatedTime of each jobDetail
-                            logging.info(
-                                "Bulkread CreatedTime: "
-                                + str(job_detail.get_created_time())
-                            )
-
-                            # Get the FileType of each jobDetail
-                            logging.info(
-                                "Bulkread File Type: " + job_detail.get_file_type()
-                            )
-
-                # Check if the request returned an exception
-                elif isinstance(response_object, APIException):
-                    # Get the Status
-                    logging.info("Status: " + response_object.get_status().get_value())
-
-                    # Get the Code
-                    logging.info("Code: " + response_object.get_code().get_value())
-
-                    logging.info("Details")
-
-                    # Get the details dict
-                    details = response_object.get_details()
-
-                    for key, value in details.items():
-                        logging.info(key + " : " + str(value))
-
-                    # Get the Message
-                    logging.info(
-                        "Message: " + response_object.get_message().get_value()
+                    # Get the Download URL of the Result
+                    logging.debug(
+                        "Bulkread Result Download URL: " + result.get_download_url()
                     )
+
+                    # Get the Per_Page of the Result
+                    logging.debug(
+                        "Bulkread Result Per_Page: " + str(result.get_per_page())
+                    )
+
+                    # Get the MoreRecords of the Result
+                    logging.debug(
+                        "Bulkread Result MoreRecords: " + str(result.get_more_records())
+                    )
+                    self._more_pages = result.get_more_records()
+
+                # Get the Query instance of each jobDetail
+                query = job_detail.get_query()
+
+                if query is not None:
+                    # Get the Module Name of the Query
+                    logging.debug("Bulk read Query Module: " + query.get_module())
+
+                    # Get the Page of the Query
+                    logging.debug("Bulk read Query Page: " + str(query.get_page()))
+
+                    # Get the cvid of the Query
+                    logging.debug("Bulk read Query cvid: " + str(query.get_cvid()))
+
+                    # Get the fields List of the Query
+                    fields = query.get_fields()
+
+                    if fields is not None:
+                        logging.debug("Bulk read fields")
+                        for field in fields:
+                            logging.debug(field)
+
+                    # Get the Criteria instance of the Query
+                    criteria = query.get_criteria()
+
+                    if criteria is not None:
+                        print_criteria(criteria)
+
+                    # Get the CreatedBy User instance of each jobDetail
+                    created_by = job_detail.get_created_by()
+
+                    # Check if created_by is not None
+                    if created_by is not None:
+                        # Get the Name of the created_by User
+                        logging.debug(
+                            "Bulkread Created By - Name: " + created_by.get_name()
+                        )
+
+                        # Get the ID of the created_by User
+                        logging.debug(
+                            "Bulkread Created By - ID: " + str(created_by.get_id())
+                        )
+
+                    # Get the CreatedTime of each jobDetail
+                    logging.debug(
+                        "Bulkread CreatedTime: " + str(job_detail.get_created_time())
+                    )
+
+                    # Get the FileType of each jobDetail
+                    logging.debug("Bulkread File Type: " + job_detail.get_file_type())
+
+        # Check if the request returned an exception
+        elif isinstance(response_object, APIException):
+            handle_api_exception(response_object)
 
     def download_result(self):
         # Get instance of BulkReadOperations Class
@@ -408,79 +380,66 @@ class BulkReadJobBatch:
             self._current_job_id
         )
 
-        if response is not None:
+        if response is None:
+            raise RuntimeError(
+                "Got no response from API when attempting to download a bulk read job result."
+            )
 
-            # Get the status code from response
-            logging.info("Status Code: " + str(response.get_status_code()))
+        # Get the status code from response
+        logging.debug("Status Code: " + str(response.get_status_code()))
 
-            if response.get_status_code() in [204, 304]:
-                logging.info(
-                    "No Content"
-                    if response.get_status_code() == 204
-                    else "Not Modified"
+        # if response.get_status_code() in [204, 304]:
+        #     logging.debug(
+        #         "No Content" if response.get_status_code() == 204 else "Not Modified"
+        #     )
+        #     return
+
+        # Get object from response
+        response_object = response.get_object()
+
+        if response_object is None:
+            raise RuntimeError(
+                "Got no or empty response object from API when attempting to get details of a bulk read job."
+            )
+
+        # Check if expected FileBodyWrapper instance is received.
+        if isinstance(response_object, FileBodyWrapper):
+
+            # Get StreamWrapper instance from the returned FileBodyWrapper instance
+            stream_wrapper = response_object.get_file()
+
+            # Construct the file name by joining the destinationFolder and the name from StreamWrapper instance
+            zip_file_name = os.path.join(
+                self.destination_folder, stream_wrapper.get_name()
+            )
+
+            # Open the destination file where the file needs to be written in 'wb' mode
+            with open(zip_file_name, "wb") as f:
+                # Get the stream from StreamWrapper instance
+                for chunk in stream_wrapper.get_stream():
+                    f.write(chunk)
+
+            with zipfile.ZipFile(zip_file_name, "r") as zip_ref:
+                zip_ref.extractall(self.destination_folder)
+                csv_file_name = os.path.join(
+                    self.destination_folder, zip_ref.filelist[0].filename
                 )
-                return
+            os.remove(zip_file_name)
 
-            # Get object from response
-            response_object = response.get_object()
+            # Update field names according to the CSV file and remove header
+            temp_csv_file_name = csv_file_name + "_temp"
+            with open(csv_file_name, "r") as csv_file, open(
+                temp_csv_file_name, "w"
+            ) as csv_file_temp:
+                csv_reader = csv.reader(csv_file)
+                field_names = next(csv_reader)
+                csv_writer = csv.writer(csv_file_temp)
+                for row in csv_reader:
+                    csv_writer.writerow(row)
+            self.field_names = field_names
+            os.remove(csv_file_name)
+            os.rename(temp_csv_file_name, csv_file_name)
 
-            if response_object is not None:
-
-                # Check if expected FileBodyWrapper instance is received.
-                if isinstance(response_object, FileBodyWrapper):
-
-                    # Get StreamWrapper instance from the returned FileBodyWrapper instance
-                    stream_wrapper = response_object.get_file()
-
-                    # Construct the file name by joining the destinationFolder and the name from StreamWrapper instance
-                    zip_file_name = os.path.join(
-                        self.destination_folder, stream_wrapper.get_name()
-                    )
-
-                    # Open the destination file where the file needs to be written in 'wb' mode
-                    with open(zip_file_name, "wb") as f:
-                        # Get the stream from StreamWrapper instance
-                        for chunk in stream_wrapper.get_stream():
-                            f.write(chunk)
-
-                    with zipfile.ZipFile(zip_file_name, "r") as zip_ref:
-                        zip_ref.extractall(self.destination_folder)
-                        csv_file_name = os.path.join(
-                            self.destination_folder, zip_ref.filelist[0].filename
-                        )
-                    os.remove(zip_file_name)
-
-                    # Update field names according to the CSV file and remove header
-                    temp_csv_file_name = csv_file_name + "_temp"
-                    with open(csv_file_name, "r") as csv_file, open(
-                        temp_csv_file_name, "w"
-                    ) as csv_file_temp:
-                        csv_reader = csv.reader(csv_file)
-                        field_names = next(csv_reader)
-                        csv_writer = csv.writer(csv_file_temp)
-                        for row in csv_reader:
-                            csv_writer.writerow(row)
-                    self.field_names = field_names
-                    os.remove(csv_file_name)
-                    os.rename(temp_csv_file_name, csv_file_name)
-
-                # Check if the request returned an exception
-                elif isinstance(response_object, APIException):
-                    # Get the Status
-                    logging.info("Status: " + response_object.get_status().get_value())
-
-                    # Get the Code
-                    logging.info("Code: " + response_object.get_code().get_value())
-
-                    logging.info("Details")
-
-                    # Get the details dict
-                    details = response_object.get_details()
-
-                    for key, value in details.items():
-                        logging.info(key + " : " + str(value))
-
-                    # Get the Message
-                    logging.info(
-                        "Message: " + response_object.get_message().get_value()
-                    )
+        # Check if the request returned an exception
+        elif isinstance(response_object, APIException):
+            handle_api_exception(response_object)

@@ -98,16 +98,22 @@ class Component(ComponentBase):
             self.token_store_path, token_store_content
         )
 
-        zoho.initialization.initialize(
-            region_code=region_code,
-            client_id=client_id,
-            client_secret=client_secret,
-            grant_token=grant_token,
-            user_email=user_email,
-            tmp_dir_path=tmp_dir_path,
-            file_store_path=self.token_store_path,
-        )
-        self.save_state()  # TODO?: Probably just save at the end - this is only any useful in dev
+        try:
+            zoho.initialization.initialize(
+                region_code=region_code,
+                client_id=client_id,
+                client_secret=client_secret,
+                grant_token=grant_token,
+                user_email=user_email,
+                tmp_dir_path=tmp_dir_path,
+                file_store_path=self.token_store_path,
+            )
+        except Exception as e:
+            raise UserException(
+                "Zoho Python SDK initialization failed.\nReason:\n" + str(e)
+            ) from e
+        finally:
+            self.save_state()  # TODO?: Probably just save at the end - this is only any useful in dev
 
         table_def = self.create_out_table_definition(
             name=f"{module_name}.csv",
@@ -115,20 +121,23 @@ class Component(ComponentBase):
             primary_key=["Id"],
             is_sliced=True,
         )
-
         os.makedirs(table_def.full_path, exist_ok=True)
-        bulk_read_job = zoho.bulk_read.BulkReadJobBatch(
-            module_api_name=module_name,
-            destination_folder=table_def.full_path,
-            file_name=table_def.name,
-            field_names=field_names,
-        )
-        bulk_read_job.download_all_pages()
-
-        table_def.columns = bulk_read_job.field_names
-        self.write_manifest(table_def)
-
-        self.save_state()
+        try:
+            bulk_read_job = zoho.bulk_read.BulkReadJobBatch(
+                module_api_name=module_name,
+                destination_folder=table_def.full_path,
+                file_name=table_def.name,
+                field_names=field_names,
+            )
+            bulk_read_job.download_all_pages()
+            table_def.columns = bulk_read_job.field_names
+            self.write_manifest(table_def)
+        except Exception as e:
+            raise UserException(
+                "Failed to download data from Zoho API.\nReason:\n" + str(e)
+            ) from e
+        finally:
+            self.save_state()
 
     def save_state(self):
         """

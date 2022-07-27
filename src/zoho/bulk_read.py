@@ -28,17 +28,17 @@ POLLING_PERIOD_SECONDS = 8
 def print_criteria(criteria: Criteria):
     if criteria.get_api_name() is not None:
         # Get the API Name of the Criteria
-        logging.debug("BulkRead Criteria API Name: " + criteria.get_api_name())
+        logging.info("BulkRead Criteria API Name: " + criteria.get_api_name())
 
     if criteria.get_comparator() is not None:
         # Get the Comparator of the Criteria
-        logging.debug(
+        logging.info(
             "BulkRead Criteria Comparator: " + criteria.get_comparator().get_value()
         )
 
     if criteria.get_value() is not None:
         # Get the Value of the Criteria
-        logging.debug("BulkRead Criteria Value: " + str(criteria.get_value()))
+        logging.info("BulkRead Criteria Value: " + str(criteria.get_value()))
 
     # Get the List of Criteria instance of each Criteria
     criteria_group = criteria.get_group()
@@ -49,7 +49,7 @@ def print_criteria(criteria: Criteria):
 
     if criteria.get_group_operator() is not None:
         # Get the Group Operator of the Criteria
-        logging.debug(
+        logging.info(
             "BulkRead Criteria Group Operator: "
             + criteria.get_group_operator().get_value()
         )
@@ -150,7 +150,7 @@ class BulkReadJobBatch:
 
         if response is not None:
             # Get the status code from response
-            logging.debug("Status Code: " + str(response.get_status_code()))
+            logging.info("Status Code: " + str(response.get_status_code()))
 
             # Get object from response
             response_object = response.get_object()
@@ -166,73 +166,73 @@ class BulkReadJobBatch:
                         # Check if the request is successful
                         if isinstance(action_response, SuccessResponse):
                             # Get the Status
-                            logging.debug(
+                            logging.info(
                                 "Status: " + action_response.get_status().get_value()
                             )
 
                             # Get the Code
-                            logging.debug(
+                            logging.info(
                                 "Code: " + action_response.get_code().get_value()
                             )
 
-                            logging.debug("Details")
+                            logging.info("Details")
 
                             # Get the details dict
                             details = action_response.get_details()
 
                             for key, value in details.items():
-                                logging.debug(key + " : " + str(value))
+                                logging.info(key + " : " + str(value))
 
                             self._current_job_id = details["id"]
 
                             # Get the Message
-                            logging.debug(
+                            logging.info(
                                 "Message: " + action_response.get_message().get_value()
                             )
 
                         # Check if the request returned an exception
                         elif isinstance(action_response, APIException):
                             # Get the Status
-                            logging.debug(
+                            logging.info(
                                 "Status: " + action_response.get_status().get_value()
                             )
 
                             # Get the Code
-                            logging.debug(
+                            logging.info(
                                 "Code: " + action_response.get_code().get_value()
                             )
 
-                            logging.debug("Details")
+                            logging.info("Details")
 
                             # Get the details dict
                             details = action_response.get_details()
 
                             for key, value in details.items():
-                                logging.debug(key + " : " + str(value))
+                                logging.info(key + " : " + str(value))
 
                             # Get the Message
-                            logging.debug(
+                            logging.info(
                                 "Message: " + action_response.get_message().get_value()
                             )
 
                 # Check if the request returned an exception
                 elif isinstance(response_object, APIException):
                     # Get the Status
-                    logging.debug("Status: " + response_object.get_status().get_value())
+                    logging.info("Status: " + response_object.get_status().get_value())
 
                     # Get the Code
-                    logging.debug("Code: " + response_object.get_code().get_value())
+                    logging.info("Code: " + response_object.get_code().get_value())
 
-                    logging.debug("Details")
+                    logging.info("Details")
 
                     # Get the details dict
                     details = response_object.get_details()
 
                     for key, value in details.items():
-                        logging.debug(key + " : " + str(value))
+                        logging.info(key + " : " + str(value))
 
                     # Get the Message
-                    logging.debug(
+                    logging.info(
                         "Message: " + response_object.get_message().get_value()
                     )
 
@@ -248,10 +248,10 @@ class BulkReadJobBatch:
         if response is not None:
 
             # Get the status code from response
-            logging.debug("Status Code: " + str(response.get_status_code()))
+            logging.info("Status Code: " + str(response.get_status_code()))
 
             if response.get_status_code() in [204, 304]:
-                logging.debug(
+                logging.info(
                     "No Content"
                     if response.get_status_code() == 204
                     else "Not Modified"
@@ -271,15 +271,15 @@ class BulkReadJobBatch:
 
                     for job_detail in job_details_list:
                         # Get the Job ID of each jobDetail
-                        logging.debug("Bulk read Job ID: " + str(job_detail.get_id()))
+                        logging.info("Bulk read Job ID: " + str(job_detail.get_id()))
 
                         # Get the Operation of each jobDetail
-                        logging.debug(
+                        logging.info(
                             "Bulk read Operation: " + job_detail.get_operation()
                         )
 
                         # Get the State of each jobDetail
-                        logging.debug(
+                        logging.info(
                             "Bulk read State: " + job_detail.get_state().get_value()
                         )
                         self._current_job_state = job_detail.get_state().get_value()
@@ -289,29 +289,29 @@ class BulkReadJobBatch:
 
                         if result is not None:
                             # Get the Page of the Result
-                            logging.debug(
+                            logging.info(
                                 "Bulkread Result Page: " + str(result.get_page())
                             )
 
                             # Get the Count of the Result
-                            logging.debug(
+                            logging.info(
                                 "Bulkread Result Count: " + str(result.get_count())
                             )
 
                             # Get the Download URL of the Result
-                            logging.debug(
+                            logging.info(
                                 "Bulkread Result Download URL: "
                                 + result.get_download_url()
                             )
 
                             # Get the Per_Page of the Result
-                            logging.debug(
+                            logging.info(
                                 "Bulkread Result Per_Page: "
                                 + str(result.get_per_page())
                             )
 
                             # Get the MoreRecords of the Result
-                            logging.debug(
+                            logging.info(
                                 "Bulkread Result MoreRecords: "
                                 + str(result.get_more_records())
                             )
@@ -322,17 +322,17 @@ class BulkReadJobBatch:
 
                         if query is not None:
                             # Get the Module Name of the Query
-                            logging.debug(
+                            logging.info(
                                 "Bulk read Query Module: " + query.get_module()
                             )
 
                             # Get the Page of the Query
-                            logging.debug(
+                            logging.info(
                                 "Bulk read Query Page: " + str(query.get_page())
                             )
 
                             # Get the cvid of the Query
-                            logging.debug(
+                            logging.info(
                                 "Bulk read Query cvid: " + str(query.get_cvid())
                             )
 
@@ -340,9 +340,9 @@ class BulkReadJobBatch:
                             fields = query.get_fields()
 
                             if fields is not None:
-                                logging.debug("Bulk read fields")
+                                logging.info("Bulk read fields")
                                 for field in fields:
-                                    logging.debug(field)
+                                    logging.info(field)
 
                             # Get the Criteria instance of the Query
                             criteria = query.get_criteria()
@@ -356,46 +356,46 @@ class BulkReadJobBatch:
                             # Check if created_by is not None
                             if created_by is not None:
                                 # Get the Name of the created_by User
-                                logging.debug(
+                                logging.info(
                                     "Bulkread Created By - Name: "
                                     + created_by.get_name()
                                 )
 
                                 # Get the ID of the created_by User
-                                logging.debug(
+                                logging.info(
                                     "Bulkread Created By - ID: "
                                     + str(created_by.get_id())
                                 )
 
                             # Get the CreatedTime of each jobDetail
-                            logging.debug(
+                            logging.info(
                                 "Bulkread CreatedTime: "
                                 + str(job_detail.get_created_time())
                             )
 
                             # Get the FileType of each jobDetail
-                            logging.debug(
+                            logging.info(
                                 "Bulkread File Type: " + job_detail.get_file_type()
                             )
 
                 # Check if the request returned an exception
                 elif isinstance(response_object, APIException):
                     # Get the Status
-                    logging.debug("Status: " + response_object.get_status().get_value())
+                    logging.info("Status: " + response_object.get_status().get_value())
 
                     # Get the Code
-                    logging.debug("Code: " + response_object.get_code().get_value())
+                    logging.info("Code: " + response_object.get_code().get_value())
 
-                    logging.debug("Details")
+                    logging.info("Details")
 
                     # Get the details dict
                     details = response_object.get_details()
 
                     for key, value in details.items():
-                        logging.debug(key + " : " + str(value))
+                        logging.info(key + " : " + str(value))
 
                     # Get the Message
-                    logging.debug(
+                    logging.info(
                         "Message: " + response_object.get_message().get_value()
                     )
 
@@ -411,10 +411,10 @@ class BulkReadJobBatch:
         if response is not None:
 
             # Get the status code from response
-            logging.debug("Status Code: " + str(response.get_status_code()))
+            logging.info("Status Code: " + str(response.get_status_code()))
 
             if response.get_status_code() in [204, 304]:
-                logging.debug(
+                logging.info(
                     "No Content"
                     if response.get_status_code() == 204
                     else "Not Modified"
@@ -467,20 +467,20 @@ class BulkReadJobBatch:
                 # Check if the request returned an exception
                 elif isinstance(response_object, APIException):
                     # Get the Status
-                    logging.debug("Status: " + response_object.get_status().get_value())
+                    logging.info("Status: " + response_object.get_status().get_value())
 
                     # Get the Code
-                    logging.debug("Code: " + response_object.get_code().get_value())
+                    logging.info("Code: " + response_object.get_code().get_value())
 
-                    logging.debug("Details")
+                    logging.info("Details")
 
                     # Get the details dict
                     details = response_object.get_details()
 
                     for key, value in details.items():
-                        logging.debug(key + " : " + str(value))
+                        logging.info(key + " : " + str(value))
 
                     # Get the Message
-                    logging.debug(
+                    logging.info(
                         "Message: " + response_object.get_message().get_value()
                     )

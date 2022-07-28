@@ -86,14 +86,40 @@ def handle_api_exception(api_exception: APIException):
     )
 
 
+@dataclass(slots=True, frozen=True)
+class BulkReadJobFilteringCriterion:
+    field_name: str
+    comparator: Literal[
+        "equal",
+        "not_equal",
+        "in",
+        "not_in",
+        "between",
+        "not_between",
+        "greater_than",
+        "greater_equal",
+        "less_than",
+        "less_equal",
+    ]
+    value: Union[str, List[str]]
+
+
+@dataclass(slots=True, frozen=True)
+class BulkReadJobFilteringCriterionGroup:
+    criteria: List[BulkReadJobFilteringCriterion]
+    group_operator: Literal["and", "or"]
+
+
 @dataclass(slots=True)
 class BulkReadJobBatch:
     module_api_name: str
     destination_folder: str
     file_name: str
     field_names: Optional[List[str]] = None
-    filtering_criterion: Optional[dict] = None
-    _current_page: int = 0
+    filtering_criteria: Optional[
+        Union[BulkReadJobFilteringCriterion, BulkReadJobFilteringCriterionGroup]
+    ] = None
+    _current_page: int = 1
     _current_job_id: Optional[int] = None
     _current_job_state: Optional[
         Literal["ADDED", "QUEUED", "IN PROGRESS", "COMPLETED"]
@@ -102,7 +128,6 @@ class BulkReadJobBatch:
 
     def download_all_pages(self):
         while self._more_pages:
-            self._current_page += 1
             self.create()
             logging.info(f"Created a bulk read job for page {self._current_page}.")
             self.get_details()
@@ -115,8 +140,9 @@ class BulkReadJobBatch:
                 self.get_details()
             logging.info(f"Page {self._current_page} ready. Downloading.")
             self.download_result()
+            self._current_page += 1
 
-    def create(self) -> int:
+    def create(self):
         # Get instance of BulkReadOperations Class
         bulk_read_operations = BulkReadOperations()
 
@@ -151,23 +177,26 @@ class BulkReadJobBatch:
         # # To set page value, By default value is 1.
         query.set_page(self._current_page)
 
-        if self.filtering_criterion:
+        if self.filtering_criteria:
             # Get instance of Criteria Class
             criteria = Criteria()
 
-            # To set API name of a field
-            criteria.set_api_name(self.filtering_criterion["field_name"])
+            if isinstance(self.filtering_criteria, BulkReadJobFilteringCriterion):
+                # To set API name of a field
+                criteria.set_api_name(self.filtering_criteria.field_name)
 
-            # To set comparator(eg: equal, greater_than)
-            criteria.set_comparator(Choice(self.filtering_criterion["comparator"]))
+                # To set comparator(eg: equal, greater_than)
+                criteria.set_comparator(Choice(self.filtering_criteria.comparator))
 
-            value: Union[str, List[str]] = self.filtering_criterion["value"]
+                value: Union[str, List[str]] = self.filtering_criteria.value
 
-            # To set the value to be compared
-            criteria.set_value(value)
+                # To set the value to be compared
+                criteria.set_value(value)
 
-            # To filter the records to be exported
-            query.set_criteria(criteria)
+                # To filter the records to be exported
+                query.set_criteria(criteria)
+            else:
+                raise NotImplementedError("Only simple criteria are supported.")
 
         # Set the query object
         request.set_query(query)

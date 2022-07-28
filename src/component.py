@@ -29,7 +29,12 @@ KEY_MODULE_RECORDS_DOWNLOAD_CONFIGS = "module_records_download_configs"
 KEY_OUTPUT_TABLE_NAME = "output_table_name"
 KEY_MODULE_NAME = "module_name"
 KEY_FIELD_NAMES = "field_names"
-KEY_FILTERING_CRITERION = "filtering_criterion"
+KEY_FILTERING_CRITERIA = "filtering_criteria"
+
+# Module records download configs simple filtering criteria keys
+KEY_FIELD_NAME = "field_name"
+KEY_COMPARATOR = "comparator"
+KEY_VALUE = "value"
 
 # list of mandatory parameters => if some is missing,
 # component will fail with readable message on initialization.
@@ -72,7 +77,7 @@ class ZohoCRMExtractor(ComponentBase):
         Main execution code
         """
 
-        # check for missing configuration parameters
+        # check for missing or invalid configuration parameters
         self.validate_configuration_parameters(REQUIRED_PARAMETERS)
         try:
             jsonschema.validate(self.configuration.parameters, self.get_schema())
@@ -151,10 +156,24 @@ class ZohoCRMExtractor(ComponentBase):
         return schema
 
     def process_module_records_download_config(self, config: dict):
+        """
+        Processes module records download config:
+        asks Zoho API to prepare the data for download and then downloads the data as sliced CSV.
+        Also creates appropriate manifest files.
+        """
         output_table_name: str = config[KEY_OUTPUT_TABLE_NAME]
         module_name: str = config[KEY_MODULE_NAME]
         field_names: Optional[List[str]] = config.get(KEY_FIELD_NAMES)
-        filtering_criterion: Optional[dict] = config.get(KEY_FILTERING_CRITERION)
+        filtering_criteria_dict: Optional[dict] = config.get(KEY_FILTERING_CRITERIA)
+
+        if filtering_criteria_dict.get(KEY_COMPARATOR):
+            filtering_criteria = zoho.bulk_read.BulkReadJobFilteringCriterion(
+                field_name=filtering_criteria_dict[KEY_FIELD_NAME],
+                comparator=filtering_criteria_dict[KEY_COMPARATOR],
+                value=filtering_criteria_dict[KEY_VALUE],
+            )
+        else:
+            raise UserException("Only simple criteria are supported.")
 
         table_def = self.create_out_table_definition(
             name=f"{output_table_name}.csv",
@@ -162,6 +181,7 @@ class ZohoCRMExtractor(ComponentBase):
             primary_key=[ID_COLUMN_NAME],
             is_sliced=True,
         )
+
         os.makedirs(table_def.full_path, exist_ok=True)
         try:
             bulk_read_job = zoho.bulk_read.BulkReadJobBatch(
@@ -169,17 +189,18 @@ class ZohoCRMExtractor(ComponentBase):
                 destination_folder=table_def.full_path,
                 file_name=table_def.name,
                 field_names=field_names,
-                filtering_criterion=filtering_criterion,
+                filtering_criteria=filtering_criteria,
             )
             bulk_read_job.download_all_pages()
-            table_def.columns = bulk_read_job.field_names
-            self.write_manifest(table_def)
         except Exception as e:
             raise UserException(
                 "Failed to download data from Zoho API.\nReason:\n" + str(e)
             ) from e
         finally:
             self.save_state()
+
+        table_def.columns = bulk_read_job.field_names
+        self.write_manifest(table_def)
 
 
 """

@@ -99,8 +99,8 @@
                         "uniqueItems": true,
                         "propertyOrder": 3
                     },
-                    "filtering_criterion": {
-                        "title": "Filtering criterion",
+                    "filtering_criteria": {
+                        "title": "Filtering criteria",
                         "type": "object",
                         "required": [
                             "field_name",

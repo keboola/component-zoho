@@ -36,6 +36,10 @@ KEY_FIELD_NAME = "field_name"
 KEY_COMPARATOR = "comparator"
 KEY_VALUE = "value"
 
+# Module records download configs simple filtering criteria keys
+KEY_GROUP = "group"
+KEY_GROUP_OPERATOR = "group_operator"
+
 # list of mandatory parameters => if some is missing,
 # component will fail with readable message on initialization.
 REQUIRED_PARAMETERS = [
@@ -172,8 +176,20 @@ class ZohoCRMExtractor(ComponentBase):
                 comparator=filtering_criteria_dict[KEY_COMPARATOR],
                 value=filtering_criteria_dict[KEY_VALUE],
             )
+        elif filtering_criteria_dict.get(KEY_GROUP):
+            filtering_criteria = zoho.bulk_read.BulkReadJobFilteringCriteriaGroup(
+                group=[
+                    zoho.bulk_read.BulkReadJobFilteringCriterion(
+                        field_name=filtering_criterion_dict[KEY_FIELD_NAME],
+                        comparator=filtering_criterion_dict[KEY_COMPARATOR],
+                        value=filtering_criterion_dict[KEY_VALUE],
+                    )
+                    for filtering_criterion_dict in filtering_criteria_dict[KEY_GROUP]
+                ],
+                group_operator=filtering_criteria_dict[KEY_GROUP_OPERATOR],
+            )
         else:
-            raise UserException("Only simple criteria are supported.")
+            raise UserException("Invalid filtering criteria used")
 
         table_def = self.create_out_table_definition(
             name=f"{output_table_name}.csv",

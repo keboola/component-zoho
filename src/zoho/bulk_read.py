@@ -105,9 +105,53 @@ class BulkReadJobFilteringCriterion:
 
 
 @dataclass(slots=True, frozen=True)
-class BulkReadJobFilteringCriterionGroup:
-    criteria: List[BulkReadJobFilteringCriterion]
+class BulkReadJobFilteringCriteriaGroup:
+    group: List[BulkReadJobFilteringCriterion]
     group_operator: Literal["and", "or"]
+
+
+def create_query_criteria_object(
+    filtering_criteria: Union[
+        BulkReadJobFilteringCriterion, BulkReadJobFilteringCriteriaGroup
+    ]
+) -> Criteria:
+    if isinstance(filtering_criteria, BulkReadJobFilteringCriterion):
+        # Get instance of Criteria Class
+        criteria = Criteria()
+
+        # To set API name of a field
+        criteria.set_api_name(filtering_criteria.field_name)
+
+        # To set comparator(eg: equal, greater_than)
+        criteria.set_comparator(Choice(filtering_criteria.comparator))
+
+        value: Union[str, List[str]] = filtering_criteria.value
+
+        # To set the value to be compared
+        criteria.set_value(value)
+
+        return criteria
+    elif isinstance(filtering_criteria, BulkReadJobFilteringCriteriaGroup):
+        # Get instance of Criteria Class
+        criteria = Criteria()
+
+        # To set the group operator(i.e.: and, or)
+        criteria.set_group_operator(Choice(filtering_criteria.group_operator))
+
+        # To set the list of Criteria instances
+        criteria.set_group(
+            [
+                create_query_criteria_object(filtering_criterion)
+                for filtering_criterion in filtering_criteria.group
+            ]
+        )
+
+        return criteria
+    else:
+        raise ValueError(
+            "Argument filtering_criteria must be an instance of"
+            " BulkReadJobFilteringCriterion or BulkReadJobFilteringCriteriaGroup."
+        )
 
 
 @dataclass(slots=True)
@@ -117,7 +161,7 @@ class BulkReadJobBatch:
     file_name: str
     field_names: Optional[List[str]] = None
     filtering_criteria: Optional[
-        Union[BulkReadJobFilteringCriterion, BulkReadJobFilteringCriterionGroup]
+        Union[BulkReadJobFilteringCriterion, BulkReadJobFilteringCriteriaGroup]
     ] = None
     _current_page: int = 1
     _current_job_id: Optional[int] = None
@@ -174,29 +218,13 @@ class BulkReadJobBatch:
         if self.field_names:
             query.set_fields(self.field_names)
 
-        # # To set page value, By default value is 1.
+        # To set page value, By default value is 1.
         query.set_page(self._current_page)
 
         if self.filtering_criteria:
-            # Get instance of Criteria Class
-            criteria = Criteria()
-
-            if isinstance(self.filtering_criteria, BulkReadJobFilteringCriterion):
-                # To set API name of a field
-                criteria.set_api_name(self.filtering_criteria.field_name)
-
-                # To set comparator(eg: equal, greater_than)
-                criteria.set_comparator(Choice(self.filtering_criteria.comparator))
-
-                value: Union[str, List[str]] = self.filtering_criteria.value
-
-                # To set the value to be compared
-                criteria.set_value(value)
-
-                # To filter the records to be exported
-                query.set_criteria(criteria)
-            else:
-                raise NotImplementedError("Only simple criteria are supported.")
+            criteria = create_query_criteria_object(self.filtering_criteria)
+            # To filter the records to be exported
+            query.set_criteria(criteria)
 
         # Set the query object
         request.set_query(query)

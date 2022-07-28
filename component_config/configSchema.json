@@ -101,77 +101,126 @@
                     },
                     "filtering_criteria": {
                         "title": "Filtering criteria",
+                        "description": "Filtering criteria is either a single filtering criterion or a filtering criteria group.",
                         "type": "object",
-                        "required": [
-                            "field_name",
-                            "comparator",
-                            "value"
-                        ],
-                        "properties": {
-                            "field_name": {
-                                "title": "Field API name",
-                                "type": "string",
-                                "minLength": 1,
-                                "propertyOrder": 1
+                        "oneOf": [
+                            {
+                                "$ref": "#/definitions/filtering_criterion"
                             },
-                            "comparator": {
-                                "title": "Comparator",
-                                "type": "string",
-                                "enum": [
-                                    "equal",
-                                    "not_equal",
-                                    "in",
-                                    "not_in",
-                                    "between",
-                                    "not_between",
-                                    "greater_than",
-                                    "greater_equal",
-                                    "less_than",
-                                    "less_equal"
-                                ],
-                                "options": {
-                                    "enum_titles": [
-                                        "Equals",
-                                        "Not equals",
-                                        "In",
-                                        "Not in",
-                                        "Between",
-                                        "Not between",
-                                        "Greater than",
-                                        "Greater than or equal to",
-                                        "Less than",
-                                        "Less than or equal to"
-                                    ]
-                                },
-                                "propertyOrder": 2
-                            },
-                            "value": {
-                                "oneOf": [
-                                    {
-                                        "title": "Simple Value",
-                                        "type": "string",
-                                        "minLength": 1
-                                    },
-                                    {
-                                        "title": "Array value",
-                                        "type": "array",
-                                        "items": {
-                                            "title": "Value",
-                                            "type": "string",
-                                            "minLength": 1
-                                        },
-                                        "minItems": 1,
-                                        "uniqueItems": true
-                                    }
-                                ]
+                            {
+                                "$ref": "#/definitions/filtering_criteria_group"
                             }
-                        }
+                        ]
                     }
                 }
             },
             "minItems": 1,
             "uniqueItems": true,
             "propertyOrder": 7
+        }
+    },
+    "definitions": {
+        "filtering_criterion": {
+            "title": "Filtering criteria",
+            "type": "object",
+            "required": [
+                "field_name",
+                "comparator",
+                "value"
+            ],
+            "properties": {
+                "field_name": {
+                    "title": "Field API name",
+                    "type": "string",
+                    "minLength": 1,
+                    "propertyOrder": 1
+                },
+                "comparator": {
+                    "title": "Comparator",
+                    "type": "string",
+                    "enum": [
+                        "equal",
+                        "not_equal",
+                        "in",
+                        "not_in",
+                        "between",
+                        "not_between",
+                        "greater_than",
+                        "greater_equal",
+                        "less_than",
+                        "less_equal"
+                    ],
+                    "options": {
+                        "enum_titles": [
+                            "Equals",
+                            "Not equals",
+                            "In",
+                            "Not in",
+                            "Between",
+                            "Not between",
+                            "Greater than",
+                            "Greater than or equal to",
+                            "Less than",
+                            "Less than or equal to"
+                        ]
+                    },
+                    "propertyOrder": 2
+                },
+                "value": {
+                    "oneOf": [
+                        {
+                            "title": "Simple Value",
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        {
+                            "title": "Array value",
+                            "type": "array",
+                            "items": {
+                                "title": "Value",
+                                "type": "string",
+                                "minLength": 1
+                            },
+                            "minItems": 1,
+                            "uniqueItems": true
+                        }
+                    ]
+                }
+            }
+        },
+        "filtering_criteria_group": {
+            "title": "Filtering criteria group",
+            "type": "object",
+            "required": [
+                "group",
+                "group_operator"
+            ],
+            "properties": {
+                "group": {
+                    "title": "Filtering criteria group",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/filtering_criterion"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                },
+                "group_operator": {
+                    "title": "Group operator",
+                    "type": "string",
+                    "enum": [
+                        "and",
+                        "or"
+                    ],
+                    "options": {
+                        "enum_titles": [
+                            "And",
+                            "Or"
+                        ]
+                    },
+                    "propertyOrder": 2
+                }
+            }
         }
     }
 }

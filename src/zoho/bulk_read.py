@@ -4,7 +4,7 @@ import os
 from time import sleep
 import zipfile
 import logging
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Union
 from zcrmsdk.src.com.zoho.crm.api.bulk_read import (
     BulkReadOperations,
     RequestWrapper,
@@ -92,6 +92,7 @@ class BulkReadJobBatch:
     destination_folder: str
     file_name: str
     field_names: Optional[List[str]] = None
+    filtering_criterion: Optional[dict] = None
     _current_page: int = 0
     _current_job_id: Optional[int] = None
     _current_job_state: Optional[
@@ -150,22 +151,23 @@ class BulkReadJobBatch:
         # # To set page value, By default value is 1.
         query.set_page(self._current_page)
 
-        # # Get instance of Criteria Class
-        # criteria = Criteria()
+        if self.filtering_criterion:
+            # Get instance of Criteria Class
+            criteria = Criteria()
 
-        # # To set API name of a field
-        # criteria.set_api_name("Created_Time")
+            # To set API name of a field
+            criteria.set_api_name(self.filtering_criterion["field_name"])
 
-        # # To set comparator(eg: equal, greater_than)
-        # criteria.set_comparator(Choice("between"))
+            # To set comparator(eg: equal, greater_than)
+            criteria.set_comparator(Choice(self.filtering_criterion["comparator"]))
 
-        # time = ["2020-06-03T17:31:48+05:30", "2020-06-03T17:31:48+05:30"]
+            value: Union[str, List[str]] = self.filtering_criterion["value"]
 
-        # # To set the value to be compared
-        # criteria.set_value(time)
+            # To set the value to be compared
+            criteria.set_value(value)
 
-        # # To filter the records to be exported
-        # query.set_criteria(criteria)
+            # To filter the records to be exported
+            query.set_criteria(criteria)
 
         # Set the query object
         request.set_query(query)

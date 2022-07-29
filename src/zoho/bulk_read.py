@@ -5,6 +5,9 @@ from time import sleep
 import zipfile
 import logging
 from typing import List, Literal, Optional, Union
+
+import dateparser
+
 from zcrmsdk.src.com.zoho.crm.api.bulk_read import (
     BulkReadOperations,
     RequestWrapper,
@@ -22,6 +25,17 @@ from zcrmsdk.src.com.zoho.crm.api.bulk_read import (
 from zcrmsdk.src.com.zoho.crm.api.util import Choice
 from zcrmsdk.src.com.zoho.crm.api.util import APIResponse
 
+# Module records download configs simple filtering criteria keys
+KEY_FIELD_NAME = "field_name"
+KEY_COMPARATOR = "comparator"
+KEY_VALUE = "value"
+KEY_PARSE_VALUE_AS_DATETIME = "parse_value_as_datetime"
+
+# Module records download configs simple filtering criteria keys
+KEY_GROUP = "group"
+KEY_GROUP_OPERATOR = "group_operator"
+
+# Other constants
 POLLING_PERIOD_SECONDS = 8
 
 
@@ -103,11 +117,41 @@ class BulkReadJobFilteringCriterion:
     ]
     value: Union[str, List[str]]
 
+    @classmethod
+    def from_dict(cls, dict: dict):
+        def parse(value):
+            return dateparser.parse(value).isoformat(timespec="seconds")
+
+        if dict.get(KEY_PARSE_VALUE_AS_DATETIME):
+            value: Union[str, List[str]] = (
+                parse(dict[KEY_VALUE])
+                if isinstance(dict[KEY_VALUE], str)
+                else [parse(v) for v in dict[KEY_VALUE]]
+            )
+        else:
+            value: Union[str, List[str]] = dict[KEY_VALUE]
+
+        return cls(
+            field_name=dict[KEY_FIELD_NAME],
+            comparator=dict[KEY_COMPARATOR],
+            value=value,
+        )
+
 
 @dataclass(slots=True, frozen=True)
 class BulkReadJobFilteringCriteriaGroup:
     group: List[BulkReadJobFilteringCriterion]
     group_operator: Literal["and", "or"]
+
+    @classmethod
+    def from_dict(cls, dict: dict):
+        return cls(
+            group=[
+                BulkReadJobFilteringCriterion.from_dict(criterion)
+                for criterion in dict[KEY_GROUP]
+            ],
+            group_operator=dict[KEY_GROUP_OPERATOR],
+        )
 
 
 def create_query_criteria_object(

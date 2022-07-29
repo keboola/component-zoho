@@ -121,7 +121,7 @@
     },
     "definitions": {
         "filtering_criterion": {
-            "title": "Filtering criteria",
+            "title": "Filtering criterion",
             "type": "object",
             "required": [
                 "field_name",
@@ -167,14 +167,18 @@
                     "propertyOrder": 2
                 },
                 "value": {
+                    "title": "Value",
+                    "propertyOrder": 3,
                     "oneOf": [
                         {
                             "title": "Simple Value",
+                            "description": "Simple value, if this represents datetime, it must be in the ISO 8601 format with time zone offset.",
                             "type": "string",
                             "minLength": 1
                         },
                         {
                             "title": "Array value",
+                            "description": "Value array, if these represent datetimes, they must be in the ISO 8601 format with time zone offset.",
                             "type": "array",
                             "items": {
                                 "title": "Value",
@@ -185,6 +189,13 @@
                             "uniqueItems": true
                         }
                     ]
+                },
+                "parse_value_as_datetime": {
+                    "title": "Parse value as datetime",
+                    "description": "If checked, values will be parsed as datetime using the dateparser library enabling you to use common date formats (e.g. \"Fri, 12 Dec 2014 10:55:50 EST\") or relative dates (e.g. \"24 hours ago CEST\", \"1 day ago CET\", \"tomorrow -0500\"). There must always be time zone information.",
+                    "type": "boolean",
+                    "format": "checkbox",
+                    "propertyOrder": 4
                 }
             }
         },

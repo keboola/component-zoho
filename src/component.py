@@ -31,15 +31,6 @@ KEY_MODULE_NAME = "module_name"
 KEY_FIELD_NAMES = "field_names"
 KEY_FILTERING_CRITERIA = "filtering_criteria"
 
-# Module records download configs simple filtering criteria keys
-KEY_FIELD_NAME = "field_name"
-KEY_COMPARATOR = "comparator"
-KEY_VALUE = "value"
-
-# Module records download configs simple filtering criteria keys
-KEY_GROUP = "group"
-KEY_GROUP_OPERATOR = "group_operator"
-
 # list of mandatory parameters => if some is missing,
 # component will fail with readable message on initialization.
 REQUIRED_PARAMETERS = [
@@ -170,23 +161,15 @@ class ZohoCRMExtractor(ComponentBase):
         field_names: Optional[List[str]] = config.get(KEY_FIELD_NAMES)
         filtering_criteria_dict: Optional[dict] = config.get(KEY_FILTERING_CRITERIA)
 
-        if filtering_criteria_dict.get(KEY_COMPARATOR):
-            filtering_criteria = zoho.bulk_read.BulkReadJobFilteringCriterion(
-                field_name=filtering_criteria_dict[KEY_FIELD_NAME],
-                comparator=filtering_criteria_dict[KEY_COMPARATOR],
-                value=filtering_criteria_dict[KEY_VALUE],
+        if filtering_criteria_dict.get(zoho.bulk_read.KEY_COMPARATOR):
+            filtering_criteria = zoho.bulk_read.BulkReadJobFilteringCriterion.from_dict(
+                filtering_criteria_dict
             )
-        elif filtering_criteria_dict.get(KEY_GROUP):
-            filtering_criteria = zoho.bulk_read.BulkReadJobFilteringCriteriaGroup(
-                group=[
-                    zoho.bulk_read.BulkReadJobFilteringCriterion(
-                        field_name=filtering_criterion_dict[KEY_FIELD_NAME],
-                        comparator=filtering_criterion_dict[KEY_COMPARATOR],
-                        value=filtering_criterion_dict[KEY_VALUE],
-                    )
-                    for filtering_criterion_dict in filtering_criteria_dict[KEY_GROUP]
-                ],
-                group_operator=filtering_criteria_dict[KEY_GROUP_OPERATOR],
+        elif filtering_criteria_dict.get(zoho.bulk_read.KEY_GROUP):
+            filtering_criteria = (
+                zoho.bulk_read.BulkReadJobFilteringCriteriaGroup.from_dict(
+                    filtering_criteria_dict
+                )
             )
         else:
             raise UserException("Invalid filtering criteria used")

@@ -13,7 +13,6 @@ from keboola.component.exceptions import UserException
 import jsonschema
 
 import zoho.initialization
-import zoho.users
 import zoho.bulk_read
 
 # Configuration variables

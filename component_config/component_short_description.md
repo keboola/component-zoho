@@ -1,1 +1,1 @@
-Testing functional sample extractor for purposes of the python component template. 
+Zoho CRM extractor using bulk read operations of the v2 API.

@@ -214,7 +214,7 @@ class BulkReadJobBatch:
     ] = None
     _more_pages: bool = True
 
-    def download_all_pages(self):
+    def download_all_pages(self):  # TODO: Add support for parallel downloads of pages
         while self._more_pages:
             self.create()
             logging.info(f"Created a bulk read job for page {self._current_page}.")

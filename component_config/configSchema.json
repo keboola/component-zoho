@@ -102,8 +102,12 @@
                     "filtering_criteria": {
                         "title": "Filtering criteria",
                         "description": "Filtering criteria is either a single filtering criterion or a filtering criteria group.",
-                        "type": "object",
                         "oneOf": [
+                            {
+                                "title": "No filtering",
+                                "description": "Select this to download all records.",
+                                "type": "null"
+                            },
                             {
                                 "$ref": "#/definitions/filtering_criterion"
                             },

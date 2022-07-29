@@ -125,7 +125,7 @@ class ZohoCRMExtractor(ComponentBase):
         finally:
             self.save_state()  # TODO?: Probably just save at the end - this is only any useful in dev
 
-        for config in module_records_download_configs:
+        for config in module_records_download_configs:  # TODO: parallelize
             self.process_module_records_download_config(config)
 
     def save_state(self):
@@ -160,18 +160,23 @@ class ZohoCRMExtractor(ComponentBase):
         field_names: Optional[List[str]] = config.get(KEY_FIELD_NAMES)
         filtering_criteria_dict: Optional[dict] = config.get(KEY_FILTERING_CRITERIA)
 
-        if filtering_criteria_dict.get(zoho.bulk_read.KEY_COMPARATOR):
-            filtering_criteria = zoho.bulk_read.BulkReadJobFilteringCriterion.from_dict(
-                filtering_criteria_dict
-            )
-        elif filtering_criteria_dict.get(zoho.bulk_read.KEY_GROUP):
-            filtering_criteria = (
-                zoho.bulk_read.BulkReadJobFilteringCriteriaGroup.from_dict(
-                    filtering_criteria_dict
+        if filtering_criteria_dict:
+            if filtering_criteria_dict.get(zoho.bulk_read.KEY_COMPARATOR):
+                filtering_criteria = (
+                    zoho.bulk_read.BulkReadJobFilteringCriterion.from_dict(
+                        filtering_criteria_dict
+                    )
                 )
-            )
+            elif filtering_criteria_dict.get(zoho.bulk_read.KEY_GROUP):
+                filtering_criteria = (
+                    zoho.bulk_read.BulkReadJobFilteringCriteriaGroup.from_dict(
+                        filtering_criteria_dict
+                    )
+                )
+            else:
+                filtering_criteria = None
         else:
-            raise UserException("Invalid filtering criteria used")
+            filtering_criteria = None
 
         table_def = self.create_out_table_definition(
             name=f"{output_table_name}.csv",

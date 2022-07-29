@@ -186,6 +186,9 @@ class ZohoCRMExtractor(ComponentBase):
         )
 
         os.makedirs(table_def.full_path, exist_ok=True)
+        logging.info(
+            f"Attempting to download data for output table {output_table_name}."
+        )
         try:
             bulk_read_job = zoho.bulk_read.BulkReadJobBatch(
                 module_api_name=module_name,

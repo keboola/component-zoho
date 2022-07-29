@@ -222,7 +222,7 @@ class BulkReadJobBatch:
             while self._current_job_state != "COMPLETED":  # TODO: Add a timeout
                 logging.info(
                     f"Page {self._current_page} not ready yet. Its current job state: {self._current_job_state}."
-                    f" Waiting {POLLING_PERIOD_SECONDS} for API server to prepare it."
+                    f" Waiting {POLLING_PERIOD_SECONDS} seconds for API server to prepare it."
                 )
                 sleep(POLLING_PERIOD_SECONDS)
                 self.get_details()

@@ -237,26 +237,11 @@ class BulkReadJobBatch:
         # Get instance of RequestWrapper Class that will contain the request body
         request = RequestWrapper()
 
-        # # Get instance of CallBack Class
-        # call_back = CallBack()
-
-        # # Set valid callback URL
-        # call_back.set_url("https://www.example.com/callback")
-
-        # # Set the HTTP method of the callback URL. The allowed value is post.
-        # call_back.set_method(Choice("post"))
-
-        # # The Bulk Read Job's details is posted to this URL on successful completion / failure of the job.
-        # request.set_callback(call_back)
-
         # Get instance of Query Class
         query = Query()
 
         # Specifies the API Name of the module to be read.
         query.set_module(self.module_api_name)
-
-        # Specifies the unique ID of the custom view, whose records you want to export.
-        # query.set_cvid('3409643000000087501')
 
         # Specifies the API Name of the fields to be fetched
         if self.field_names:
@@ -362,12 +347,6 @@ class BulkReadJobBatch:
 
         # Get the status code from response
         logging.debug("Status Code: " + str(response.get_status_code()))
-
-        # if response.get_status_code() in [204, 304]:
-        #     logging.debug(
-        #         "No Content" if response.get_status_code() == 204 else "Not Modified"
-        #     )
-        #     return
 
         # Get object from response
         response_object = response.get_object()
@@ -490,12 +469,6 @@ class BulkReadJobBatch:
 
         # Get the status code from response
         logging.debug("Status Code: " + str(response.get_status_code()))
-
-        # if response.get_status_code() in [204, 304]:
-        #     logging.debug(
-        #         "No Content" if response.get_status_code() == 204 else "Not Modified"
-        #     )
-        #     return
 
         # Get object from response
         response_object = response.get_object()

@@ -17,10 +17,6 @@ from zcrmsdk.src.com.zoho.crm.api.initializer import Initializer
 from zcrmsdk.src.com.zoho.api.authenticator.oauth_token import OAuthToken
 from zcrmsdk.src.com.zoho.crm.api.sdk_config import SDKConfig
 
-# Constants # TODO: validate and move elsewhere
-# SCOPE = "ZohoCRM.modules.all,ZohoCRM.users.all,ZohoCRM.org.all,ZohoCRM.settings.all,AAAServer.profile.READ"
-# Actually needed: ZohoCRM.modules.READ,ZohoCRM.bulk.READ
-
 
 def code_to_dc(code: str) -> DataCenter:
     if code == "EU":
@@ -94,9 +90,6 @@ def initialize(
         client_id=client_id,
         client_secret=client_secret,
         grant_token=grant_token,
-        # refresh_token="refresh_token",
-        # redirect_url="redirectURL",
-        # id="id",
     )
 
     """
@@ -105,25 +98,6 @@ def initialize(
         """
     # Create file if it doesn't exist
     store = FileStore(file_path=str(file_store_path))
-
-    """
-        Create an instance of TokenStore
-        1 -> DataBase host name. Default value "localhost"
-        2 -> DataBase name. Default value "zohooauth"
-        3 -> DataBase user name. Default value "root"
-        4 -> DataBase password. Default value ""
-        5 -> DataBase port number. Default value "3306"
-        6 ->  DataBase table name . Default value "oauthtoken"
-        """
-    # store = DBStore()
-    # store = DBStore(
-    #     host="host_name",
-    #     database_name="database_name",
-    #     user_name="user_name",
-    #     password="password",
-    #     port_number="port_number",
-    #     table_name="table_name",
-    # )
 
     """
         auto_refresh_fields (Default value is False)
@@ -160,19 +134,6 @@ def initialize(
     resource_path = str(tmp_dir_path)
 
     """
-        Create an instance of RequestProxy class that takes the following parameters
-        1 -> Host
-        2 -> Port Number
-        3 -> User Name. Default value is None
-        4 -> Password. Default value is None
-        """
-    # request_proxy = RequestProxy(host="host", port=8080)
-
-    # request_proxy = RequestProxy(
-    #     host="host", port=8080, user="user", password="password"
-    # )
-
-    """
         Call the static initialize method of Initializer class that takes the following arguments
         1 -> UserSignature instance
         2 -> Environment instance
@@ -191,5 +152,4 @@ def initialize(
         sdk_config=config,
         resource_path=resource_path,
         logger=logger,
-        # proxy=request_proxy,
     )

@@ -5,5 +5,4 @@ mock
 freezegun
 jsonschema
 zohocrmsdk2_0
-mysql-connector-python
 dateparser

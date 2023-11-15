@@ -8,7 +8,7 @@
         "#grant_token",
         "user_email",
         "load_mode",
-        "module_records_download_configs"
+        "module_records_download_config"
     ],
     "properties": {
         "region_code": {
@@ -64,10 +64,7 @@
             },
             "propertyOrder": 6
         },
-        "module_records_download_configs": {
-            "title": "Module records download configurations",
-            "type": "array",
-            "items": {
+        "module_records_download_config": {
                 "title": "Module records download configuration",
                 "type": "object",
                 "required": [
@@ -116,8 +113,7 @@
                             }
                         ]
                     }
-                }
-            },
+                },
             "minItems": 1,
             "uniqueItems": true,
             "propertyOrder": 7

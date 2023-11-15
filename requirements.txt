@@ -6,3 +6,4 @@ freezegun
 jsonschema
 zohocrmsdk2_0
 dateparser
+mysql-connector # zoho TokenStore dependency

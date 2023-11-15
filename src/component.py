@@ -22,7 +22,7 @@ KEY_CLIENT_SECRET = "#client_secret"
 KEY_GRANT_TOKEN = "#grant_token"
 KEY_USER_EMAIL = "user_email"
 KEY_LOAD_MODE = "load_mode"
-KEY_MODULE_RECORDS_DOWNLOAD_CONFIGS = "module_records_download_configs"
+KEY_MODULE_RECORDS_DOWNLOAD_CONFIG = "module_records_download_config"
 
 # Module records download configs keys
 KEY_OUTPUT_TABLE_NAME = "output_table_name"
@@ -39,7 +39,7 @@ REQUIRED_PARAMETERS = [
     KEY_GRANT_TOKEN,
     KEY_USER_EMAIL,
     KEY_LOAD_MODE,
-    KEY_MODULE_RECORDS_DOWNLOAD_CONFIGS,
+    KEY_MODULE_RECORDS_DOWNLOAD_CONFIG,
 ]
 REQUIRED_IMAGE_PARS = []
 
@@ -89,8 +89,8 @@ class ZohoCRMExtractor(ComponentBase):
         grant_token: str = params[KEY_GRANT_TOKEN]
         user_email: str = params[KEY_USER_EMAIL]
         load_mode: Literal["full", "incremental"] = params[KEY_LOAD_MODE]
-        module_records_download_configs: List[dict] = params[
-            KEY_MODULE_RECORDS_DOWNLOAD_CONFIGS
+        module_records_download_config: dict = params[
+            KEY_MODULE_RECORDS_DOWNLOAD_CONFIG
         ]
 
         self.incremental: bool = load_mode == "incremental"
@@ -125,8 +125,7 @@ class ZohoCRMExtractor(ComponentBase):
         finally:
             self.save_state()  # TODO?: Probably just save at the end - this is only any useful in dev
 
-        for config in module_records_download_configs:  # TODO: parallelize
-            self.process_module_records_download_config(config)
+        self.process_module_records_download_config(module_records_download_config)
 
     def save_state(self):
         """
@@ -189,6 +188,9 @@ class ZohoCRMExtractor(ComponentBase):
         logging.info(
             f"Attempting to download data for output table {output_table_name}."
         )
+
+        print(module_name, field_names, filtering_criteria)
+
         try:
             bulk_read_job = zoho.bulk_read.BulkReadJobBatch(
                 module_api_name=module_name,

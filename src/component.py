@@ -25,14 +25,9 @@ KEY_MODULE_NAME = "module_name"
 KEY_FIELD_NAMES = "field_names"
 KEY_FILTERING_CRITERIA = "filtering_criteria"
 
-# list of mandatory parameters => if some is missing,
-# component will fail with readable message on initialization.
 REQUIRED_PARAMETERS = [
-    KEY_USER_EMAIL,
-    KEY_LOAD_MODE,
     KEY_MODULE_RECORDS_DOWNLOAD_CONFIG,
 ]
-REQUIRED_IMAGE_PARS = []
 
 # State variables
 KEY_TOKEN_STORE_CONTENT = "#token_store_content"

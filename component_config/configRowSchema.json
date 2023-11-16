@@ -1,6 +1,63 @@
 {
-    "title": "Zoho CRM API (v2) row configuration",
-    "type": "object",
-    "required": [],
-    "properties": {}
+  "title": "Zoho CRM API (v2) row configuration",
+  "type": "object",
+  "required": [
+    "module_records_download_config"
+  ],
+  "properties": {
+    "module_records_download_config": {
+      "title": "Module records download configuration",
+      "type": "object",
+      "required": [
+        "output_table_name",
+        "module_name"
+      ],
+      "properties": {
+        "output_table_name": {
+          "title": "Output table name",
+          "type": "string",
+          "minLength": 1,
+          "propertyOrder": 1
+        },
+        "module_name": {
+          "title": "Module API name",
+          "type": "string",
+          "minLength": 1,
+          "propertyOrder": 2
+        },
+        "field_names": {
+          "title": "Field API names",
+          "description": "List of field names to be downloaded",
+          "type": "array",
+          "items": {
+            "title": "Field API name",
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true,
+          "propertyOrder": 3
+        },
+        "filtering_criteria": {
+          "title": "Filtering criteria",
+          "description": "Filtering criteria is either a single filtering criterion or a filtering criteria group.",
+          "oneOf": [
+            {
+              "title": "No filtering",
+              "description": "Select this to download all records.",
+              "type": "null"
+            },
+            {
+              "$ref": "#/definitions/filtering_criterion"
+            },
+            {
+              "$ref": "#/definitions/filtering_criteria_group"
+            }
+          ]
+        }
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "propertyOrder": 2
+    }
+  }
 }

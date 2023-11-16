@@ -1,213 +1,46 @@
 {
-    "title": "Zoho CRM API (v2) configuration",
-    "type": "object",
-    "required": [
-        "account",
-        "destination",
-        "module_records_download_config"
-    ],
-    "properties": {
-        "account": {
-            "title": "Account",
-            "type": "object",
-            "required": ["user_email"],
-            "propertyOrder": 1,
-            "properties": {
-                "user_email": {
-                    "title": "User email",
-                    "type": "string"
-                }
-            }
-        },
-        "module_records_download_config": {
-                "title": "Module records download configuration",
-                "type": "object",
-                "required": [
-                    "output_table_name",
-                    "module_name"
-                ],
-                "properties": {
-                    "output_table_name": {
-                        "title": "Output table name",
-                        "type": "string",
-                        "minLength": 1,
-                        "propertyOrder": 1
-                    },
-                    "module_name": {
-                        "title": "Module API name",
-                        "type": "string",
-                        "minLength": 1,
-                        "propertyOrder": 2
-                    },
-                    "field_names": {
-                        "title": "Field API names",
-                        "description": "List of field names to be downloaded",
-                        "type": "array",
-                        "items": {
-                            "title": "Field API name",
-                            "type": "string",
-                            "minLength": 1
-                        },
-                        "uniqueItems": true,
-                        "propertyOrder": 3
-                    },
-                    "filtering_criteria": {
-                        "title": "Filtering criteria",
-                        "description": "Filtering criteria is either a single filtering criterion or a filtering criteria group.",
-                        "oneOf": [
-                            {
-                                "title": "No filtering",
-                                "description": "Select this to download all records.",
-                                "type": "null"
-                            },
-                            {
-                                "$ref": "#/definitions/filtering_criterion"
-                            },
-                            {
-                                "$ref": "#/definitions/filtering_criteria_group"
-                            }
-                        ]
-                    }
-                },
-            "minItems": 1,
-            "uniqueItems": true,
-            "propertyOrder": 2
-        },
+  "title": "Zoho CRM API (v2) configuration",
+  "type": "object",
+  "required": [
+    "account",
+    "destination"
+  ],
+  "properties": {
+    "account": {
+      "title": "Account",
+      "type": "object",
+      "required": [
+        "user_email"
+      ],
+      "propertyOrder": 1,
+      "properties": {
+        "user_email": {
+          "title": "User email",
+          "type": "string"
+        }
+      }
+    },
     "destination": {
-        "title": "Destination settings",
-        "type": "object",
-        "propertyOrder": 2,
-        "properties": {
-                    "load_mode": {
-            "title": "Load mode",
-            "type": "string",
-            "enum": [
-                "full",
-                "incremental"
-            ],
-            "options": {
-                "enum_titles": [
-                    "Full",
-                    "Incremental"
-                ]
-            },
-            "propertyOrder": 3
+      "title": "Destination settings",
+      "type": "object",
+      "propertyOrder": 2,
+      "properties": {
+        "load_mode": {
+          "title": "Load mode",
+          "type": "string",
+          "enum": [
+            "full",
+            "incremental"
+          ],
+          "options": {
+            "enum_titles": [
+              "Full",
+              "Incremental"
+            ]
+          },
+          "propertyOrder": 3
         }
-        }
-    }},
-    "definitions": {
-        "filtering_criterion": {
-            "title": "Filtering criterion",
-            "type": "object",
-            "required": [
-                "field_name",
-                "comparator",
-                "value"
-            ],
-            "properties": {
-                "field_name": {
-                    "title": "Field API name",
-                    "type": "string",
-                    "minLength": 1,
-                    "propertyOrder": 1
-                },
-                "comparator": {
-                    "title": "Comparator",
-                    "type": "string",
-                    "enum": [
-                        "equal",
-                        "not_equal",
-                        "in",
-                        "not_in",
-                        "between",
-                        "not_between",
-                        "greater_than",
-                        "greater_equal",
-                        "less_than",
-                        "less_equal"
-                    ],
-                    "options": {
-                        "enum_titles": [
-                            "Equals",
-                            "Not equals",
-                            "In",
-                            "Not in",
-                            "Between",
-                            "Not between",
-                            "Greater than",
-                            "Greater than or equal to",
-                            "Less than",
-                            "Less than or equal to"
-                        ]
-                    },
-                    "propertyOrder": 2
-                },
-                "value": {
-                    "title": "Value",
-                    "propertyOrder": 3,
-                    "oneOf": [
-                        {
-                            "title": "Simple Value",
-                            "description": "Simple value, if this represents datetime, it must be in the ISO 8601 format with time zone offset.",
-                            "type": "string",
-                            "minLength": 1
-                        },
-                        {
-                            "title": "Array value",
-                            "description": "Value array, if these represent datetimes, they must be in the ISO 8601 format with time zone offset.",
-                            "type": "array",
-                            "items": {
-                                "title": "Value",
-                                "type": "string",
-                                "minLength": 1
-                            },
-                            "minItems": 1,
-                            "uniqueItems": true
-                        }
-                    ]
-                },
-                "parse_value_as_datetime": {
-                    "title": "Parse value as datetime",
-                    "description": "If checked, values will be parsed as datetime using the dateparser library enabling you to use common date formats (e.g. \"Fri, 12 Dec 2014 10:55:50 EST\") or relative dates (e.g. \"24 hours ago CEST\", \"1 day ago CET\", \"tomorrow -0500\"). There must always be time zone information.",
-                    "type": "boolean",
-                    "format": "checkbox",
-                    "propertyOrder": 4
-                }
-            }
-        },
-        "filtering_criteria_group": {
-            "title": "Filtering criteria group",
-            "type": "object",
-            "required": [
-                "group",
-                "group_operator"
-            ],
-            "properties": {
-                "group": {
-                    "title": "Filtering criteria group",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/filtering_criterion"
-                    },
-                    "minItems": 1,
-                    "uniqueItems": true
-                },
-                "group_operator": {
-                    "title": "Group operator",
-                    "type": "string",
-                    "enum": [
-                        "and",
-                        "or"
-                    ],
-                    "options": {
-                        "enum_titles": [
-                            "And",
-                            "Or"
-                        ]
-                    },
-                    "propertyOrder": 2
-                }
-            }
-        }
+      }
     }
+  }
 }

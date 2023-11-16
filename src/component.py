@@ -15,6 +15,7 @@ import zoho.initialization
 import zoho.bulk_read
 
 # Configuration variables
+KEY_GROUP_ACCOUNT = "account"
 KEY_USER_EMAIL = "user_email"
 KEY_LOAD_MODE = "load_mode"
 KEY_MODULE_RECORDS_DOWNLOAD_CONFIG = "module_records_download_config"
@@ -63,7 +64,7 @@ class ZohoCRMExtractor(ComponentBase):
         client_id = credentials.get("appKey")
         client_secret = credentials.get("#appSecret")
 
-        user_email: str = params[KEY_USER_EMAIL]
+        user_email: str = params.get(KEY_GROUP_ACCOUNT, {}).get(KEY_USER_EMAIL)
         load_mode: Literal["full", "incremental"] = params[KEY_LOAD_MODE]
         module_records_download_config: dict = params[
             KEY_MODULE_RECORDS_DOWNLOAD_CONFIG

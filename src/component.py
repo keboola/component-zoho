@@ -66,7 +66,7 @@ class ZohoCRMExtractor(ComponentBase):
         client_secret = credentials.get("#appSecret")
 
         user_email: str = params.get(KEY_GROUP_ACCOUNT, {}).get(KEY_USER_EMAIL)
-        load_mode: str = params.get(KEY_GROUP_DESTINATION, {}).get(KEY_LOAD_MODE)
+        load_mode: str = params.get(KEY_GROUP_DESTINATION, {}).get(KEY_LOAD_MODE, "full_load")
         module_records_download_config: dict = params[
             KEY_MODULE_RECORDS_DOWNLOAD_CONFIG
         ]
@@ -100,31 +100,8 @@ class ZohoCRMExtractor(ComponentBase):
             raise UserException(
                 "Zoho Python SDK initialization failed.\nReason:\n" + str(e)
             ) from e
-        finally:
-            self.save_state()  # TODO?: Probably just save at the end - this is only any useful in dev
 
         self.process_module_records_download_config(module_records_download_config)
-
-    def save_state(self):
-        """
-        Save state to data/out/state.json
-        """
-        token_store_content = zoho.initialization.get_filestore_file(
-            self.token_store_path
-        )
-        self.state["#token_store_content"] = token_store_content
-        self.write_state_file(self.state)
-
-    def get_schema(self):
-        """
-        Returns JSON schema for the component configuration.
-        """
-        schema_path = (
-                Path(__file__).parent.parent / "component_config" / "configSchema.json"
-        )
-        with open(schema_path, "r") as schema_file:
-            schema = json.load(schema_file)
-        return schema
 
     def process_module_records_download_config(self, config: dict):
         """
@@ -167,8 +144,6 @@ class ZohoCRMExtractor(ComponentBase):
             f"Attempting to download data for output table {output_table_name}."
         )
 
-        print(module_name, field_names, filtering_criteria)
-
         try:
             bulk_read_job = zoho.bulk_read.BulkReadJobBatch(
                 module_api_name=module_name,
@@ -182,8 +157,6 @@ class ZohoCRMExtractor(ComponentBase):
             raise UserException(
                 "Failed to download data from Zoho API.\nReason:\n" + str(e)
             ) from e
-        finally:
-            self.save_state()
 
         table_def.columns = bulk_read_job.field_names
         self.write_manifest(table_def)

@@ -10,6 +10,7 @@
         "account": {
             "title": "Account",
             "type": "object",
+            "required": ["user_email"],
             "propertyOrder": 1,
             "properties": {
                 "user_email": {

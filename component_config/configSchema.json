@@ -2,10 +2,22 @@
     "title": "Zoho CRM API (v2) configuration",
     "type": "object",
     "required": [
+        "account",
         "destination",
         "module_records_download_config"
     ],
     "properties": {
+        "account": {
+            "title": "Account",
+            "type": "object",
+            "propertyOrder": 1,
+            "properties": {
+                "user_email": {
+                    "title": "User email",
+                    "type": "string"
+                }
+            }
+        },
         "module_records_download_config": {
                 "title": "Module records download configuration",
                 "type": "object",
@@ -58,7 +70,7 @@
                 },
             "minItems": 1,
             "uniqueItems": true,
-            "propertyOrder": 1
+            "propertyOrder": 2
         },
     "destination": {
         "title": "Destination settings",
@@ -78,7 +90,7 @@
                     "Incremental"
                 ]
             },
-            "propertyOrder": 1
+            "propertyOrder": 3
         }
         }
     }},

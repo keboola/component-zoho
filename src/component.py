@@ -59,7 +59,6 @@ class ZohoCRMExtractor(ComponentBase):
         credentials = (self.configuration.config_data.get("authorization", {}).get("oauth_api", {})
                        .get("credentials", {}))
         credentials_data = json.loads(credentials.get("#data"))
-
         refresh_token = credentials_data.get("refresh_token")
         client_id = credentials.get("appKey")
         client_secret = credentials.get("#appSecret")

@@ -59,9 +59,10 @@ class ZohoCRMExtractor(ComponentBase):
 
         oauth_credentials = self.configuration.oauth_credentials.data
         if not oauth_credentials:
-            raise UserException(f"oAuth credentials are not available. Please authorize the extractor.")
+            raise UserException("oAuth credentials are not available. Please authorize the extractor.")
 
-        credentials = self.configuration.config_data.get("authorization", {}).get("oauth_api", {}).get("credentials", {})
+        credentials = (self.configuration.config_data.get("authorization", {}).get("oauth_api", {})
+                       .get("credentials", {}))
         credentials_data = json.loads(credentials.get("#data"))
 
         refresh_token = credentials_data.get("refresh_token")

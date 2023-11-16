@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Literal
 
 from zcrmsdk.src.com.zoho.crm.api.user_signature import UserSignature
 from zcrmsdk.src.com.zoho.crm.api.dc import (

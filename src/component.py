@@ -10,16 +10,11 @@ import json
 
 from keboola.component.base import ComponentBase
 from keboola.component.exceptions import UserException
-import jsonschema
 
 import zoho.initialization
 import zoho.bulk_read
 
 # Configuration variables
-KEY_REGION_CODE = "region_code"
-KEY_CLIENT_ID = "client_id"
-KEY_CLIENT_SECRET = "#client_secret"
-KEY_GRANT_TOKEN = "#grant_token"
 KEY_USER_EMAIL = "user_email"
 KEY_LOAD_MODE = "load_mode"
 KEY_MODULE_RECORDS_DOWNLOAD_CONFIG = "module_records_download_config"
@@ -33,10 +28,6 @@ KEY_FILTERING_CRITERIA = "filtering_criteria"
 # list of mandatory parameters => if some is missing,
 # component will fail with readable message on initialization.
 REQUIRED_PARAMETERS = [
-    KEY_REGION_CODE,
-    KEY_CLIENT_ID,
-    KEY_CLIENT_SECRET,
-    KEY_GRANT_TOKEN,
     KEY_USER_EMAIL,
     KEY_LOAD_MODE,
     KEY_MODULE_RECORDS_DOWNLOAD_CONFIG,
@@ -47,46 +38,36 @@ REQUIRED_IMAGE_PARS = []
 KEY_TOKEN_STORE_CONTENT = "#token_store_content"
 
 # Other constants
+REGION_CODE = "EU"
 TMP_DATA_DIR_NAME = "tmp_data"
 TOKEN_STORE_FILE_NAME = "token_store.csv"
 ID_COLUMN_NAME = "Id"
 
 
 class ZohoCRMExtractor(ComponentBase):
-    """
-    Extends base class for general Python components. Initializes the CommonInterface
-    and performs configuration validation.
 
-    For easier debugging the data folder is picked up by default from `../data` path,
-    relative to working directory.
-
-    If `debug` parameter is present in the `config.json`, the default logger is set to verbose DEBUG mode.
-    """
-
-    # def __init__(self):
-    #     super().__init__()
+    def __init__(self):
+        super().__init__()
+        self.incremental = None
+        self.token_store_path = None
+        self.state = None
 
     def run(self):
-        """
-        Main execution code
-        """
 
-        # check for missing or invalid configuration parameters
         self.validate_configuration_parameters(REQUIRED_PARAMETERS)
-        try:
-            jsonschema.validate(self.configuration.parameters, self.get_schema())
-        except jsonschema.ValidationError as e:
-            raise UserException(
-                f"Configuration validation error: {e.message}."
-                f" Please make sure provided configuration is valid."
-            ) from e
-        self.validate_image_parameters(REQUIRED_IMAGE_PARS)
         params: dict = self.configuration.parameters
-        # Access parameters in data/config.json
-        region_code: str = params[KEY_REGION_CODE]
-        client_id: str = params[KEY_CLIENT_ID]
-        client_secret: str = params[KEY_CLIENT_SECRET]
-        grant_token: str = params[KEY_GRANT_TOKEN]
+
+        oauth_credentials = self.configuration.oauth_credentials.data
+        if not oauth_credentials:
+            raise UserException(f"oAuth credentials are not available. Please authorize the extractor.")
+
+        credentials = self.configuration.config_data.get("authorization", {}).get("oauth_api", {}).get("credentials", {})
+        credentials_data = json.loads(credentials.get("#data"))
+
+        refresh_token = credentials_data.get("refresh_token")
+        client_id = credentials.get("appKey")
+        client_secret = credentials.get("#appSecret")
+
         user_email: str = params[KEY_USER_EMAIL]
         load_mode: Literal["full", "incremental"] = params[KEY_LOAD_MODE]
         module_records_download_config: dict = params[
@@ -110,10 +91,10 @@ class ZohoCRMExtractor(ComponentBase):
 
         try:
             zoho.initialization.initialize(
-                region_code=region_code,
                 client_id=client_id,
                 client_secret=client_secret,
-                grant_token=grant_token,
+                refresh_token=refresh_token,
+                region_code=REGION_CODE,
                 user_email=user_email,
                 tmp_dir_path=tmp_dir_path,
                 file_store_path=self.token_store_path,
@@ -142,7 +123,7 @@ class ZohoCRMExtractor(ComponentBase):
         Returns JSON schema for the component configuration.
         """
         schema_path = (
-            Path(__file__).parent.parent / "component_config" / "configSchema.json"
+                Path(__file__).parent.parent / "component_config" / "configSchema.json"
         )
         with open(schema_path, "r") as schema_file:
             schema = json.load(schema_file)

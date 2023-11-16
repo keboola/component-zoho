@@ -2,68 +2,10 @@
     "title": "Zoho CRM API (v2) configuration",
     "type": "object",
     "required": [
-        "region_code",
-        "client_id",
-        "#client_secret",
-        "#grant_token",
-        "user_email",
-        "load_mode",
+        "destination",
         "module_records_download_config"
     ],
     "properties": {
-        "region_code": {
-            "title": "Zoho account region code",
-            "type": "string",
-            "enum": [
-                "EU",
-                "US",
-                "CN",
-                "IN",
-                "AU",
-                "JP"
-            ],
-            "propertyOrder": 1
-        },
-        "client_id": {
-            "title": "Account's client ID",
-            "type": "string",
-            "minLength": 8,
-            "propertyOrder": 2
-        },
-        "#client_secret": {
-            "title": "Account's client secret",
-            "type": "string",
-            "minLength": 8,
-            "propertyOrder": 3
-        },
-        "#grant_token": {
-            "title": "Account's grant token",
-            "type": "string",
-            "minLength": 8,
-            "propertyOrder": 4
-        },
-        "user_email": {
-            "title": "Account's user email",
-            "type": "string",
-            "format": "email",
-            "minLength": 3,
-            "propertyOrder": 5
-        },
-        "load_mode": {
-            "title": "Load mode",
-            "type": "string",
-            "enum": [
-                "full",
-                "incremental"
-            ],
-            "options": {
-                "enum_titles": [
-                    "Full",
-                    "Incremental"
-                ]
-            },
-            "propertyOrder": 6
-        },
         "module_records_download_config": {
                 "title": "Module records download configuration",
                 "type": "object",
@@ -116,9 +58,30 @@
                 },
             "minItems": 1,
             "uniqueItems": true,
-            "propertyOrder": 7
+            "propertyOrder": 1
+        },
+    "destination": {
+        "title": "Destination settings",
+        "type": "object",
+        "propertyOrder": 2,
+        "properties": {
+                    "load_mode": {
+            "title": "Load mode",
+            "type": "string",
+            "enum": [
+                "full",
+                "incremental"
+            ],
+            "options": {
+                "enum_titles": [
+                    "Full",
+                    "Incremental"
+                ]
+            },
+            "propertyOrder": 1
         }
-    },
+        }
+    }},
     "definitions": {
         "filtering_criterion": {
             "title": "Filtering criterion",

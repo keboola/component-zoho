@@ -4,7 +4,7 @@ Zoho CRM Extractor component main module.
 """
 import logging
 from pathlib import Path
-from typing import List, Literal, Optional
+from typing import List, Optional
 import os
 import json
 
@@ -17,6 +17,7 @@ import zoho.bulk_read
 # Configuration variables
 KEY_GROUP_ACCOUNT = "account"
 KEY_USER_EMAIL = "user_email"
+KEY_GROUP_DESTINATION = "destination"
 KEY_LOAD_MODE = "load_mode"
 KEY_MODULE_RECORDS_DOWNLOAD_CONFIG = "module_records_download_config"
 
@@ -65,7 +66,7 @@ class ZohoCRMExtractor(ComponentBase):
         client_secret = credentials.get("#appSecret")
 
         user_email: str = params.get(KEY_GROUP_ACCOUNT, {}).get(KEY_USER_EMAIL)
-        load_mode: Literal["full", "incremental"] = params[KEY_LOAD_MODE]
+        load_mode: str = params.get(KEY_GROUP_DESTINATION, {}).get(KEY_LOAD_MODE)
         module_records_download_config: dict = params[
             KEY_MODULE_RECORDS_DOWNLOAD_CONFIG
         ]

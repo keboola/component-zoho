@@ -58,6 +58,28 @@
       "minItems": 1,
       "uniqueItems": true,
       "propertyOrder": 2
+    },
+        "destination": {
+      "title": "Destination settings",
+      "type": "object",
+      "propertyOrder": 2,
+      "properties": {
+        "load_mode": {
+          "title": "Load mode",
+          "type": "string",
+          "enum": [
+            "full",
+            "incremental"
+          ],
+          "options": {
+            "enum_titles": [
+              "Full",
+              "Incremental"
+            ]
+          },
+          "propertyOrder": 3
+        }
+      }
     }
   }
 }

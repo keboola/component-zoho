@@ -21,7 +21,6 @@ KEY_GROUP_DESTINATION = "destination"
 KEY_LOAD_MODE = "load_mode"
 KEY_MODULE_RECORDS_DOWNLOAD_CONFIG = "module_records_download_config"
 
-# Module records download configs keys
 KEY_OUTPUT_TABLE_NAME = "output_table_name"
 KEY_MODULE_NAME = "module_name"
 KEY_FIELD_NAMES = "field_names"

@@ -112,6 +112,8 @@ class ZohoCRMExtractor(ComponentBase):
         field_names: Optional[List[str]] = config.get(KEY_FIELD_NAMES)
         filtering_criteria_dict: Optional[dict] = config.get(KEY_FILTERING_CRITERIA)
 
+        self.validate_filtering_criteria(filtering_criteria_dict)
+
         filtering_criteria = None
         if filtering_criteria_dict:
             key_comparator = filtering_criteria_dict.get(zoho.bulk_read.KEY_COMPARATOR)
@@ -146,6 +148,14 @@ class ZohoCRMExtractor(ComponentBase):
 
         table_def.columns = bulk_read_job.field_names
         self.write_manifest(table_def)
+
+    @staticmethod
+    def validate_filtering_criteria(criteria: dict):
+        # TODO: implement proper validation
+        allowed_keys = ["group", "field_name", "comparator", "value", "group_operator"]
+        for key in criteria:
+            if key not in allowed_keys:
+                raise UserException(f"{key} is not a valid filter key.")
 
 
 """

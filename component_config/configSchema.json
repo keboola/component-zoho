@@ -2,8 +2,7 @@
   "title": "Zoho CRM API (v2) configuration",
   "type": "object",
   "required": [
-    "account",
-    "destination"
+    "account"
   ],
   "properties": {
     "account": {

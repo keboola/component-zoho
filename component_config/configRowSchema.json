@@ -9,16 +9,9 @@
       "title": "Module records download configuration",
       "type": "object",
       "required": [
-        "output_table_name",
         "module_name"
       ],
       "properties": {
-        "output_table_name": {
-          "title": "Output table name",
-          "type": "string",
-          "minLength": 1,
-          "propertyOrder": 1
-        },
         "module_name": {
           "title": "Module API name",
           "type": "string",
@@ -29,10 +22,14 @@
           "title": "Field API names",
           "description": "List of field names to be downloaded",
           "type": "array",
+          "format": "select",
           "items": {
             "title": "Field API name",
             "type": "string",
             "minLength": 1
+          },
+          "options": {
+            "tags": true
           },
           "uniqueItems": true,
           "propertyOrder": 3
@@ -59,7 +56,7 @@
       "uniqueItems": true,
       "propertyOrder": 2
     },
-        "destination": {
+    "destination": {
       "title": "Destination settings",
       "type": "object",
       "propertyOrder": 2,
@@ -78,6 +75,12 @@
             ]
           },
           "propertyOrder": 3
+        },
+        "output_table_name": {
+          "title": "Output table name",
+          "type": "string",
+          "minLength": 1,
+          "propertyOrder": 1
         }
       }
     }

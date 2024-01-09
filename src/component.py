@@ -65,6 +65,9 @@ class ZohoCRMExtractor(ComponentBase):
         client_secret = credentials.get("#appSecret")
 
         user_email: str = params.get(KEY_GROUP_ACCOUNT, {}).get(KEY_USER_EMAIL)
+        if not user_email:
+            raise UserException(f"Parameter user_email is mandatory.")
+
         load_mode: str = params.get(KEY_GROUP_DESTINATION, {}).get(KEY_LOAD_MODE, "full_load")
         module_records_download_config: dict = params[
             KEY_MODULE_RECORDS_DOWNLOAD_CONFIG

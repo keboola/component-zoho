@@ -117,18 +117,13 @@ class ZohoCRMExtractor(ComponentBase):
         filtering_criteria_dict: Optional[dict] = config.get(KEY_FILTERING_CRITERIA)
 
         if filtering_criteria_dict:
-            if filtering_criteria_dict.get(zoho.bulk_read.KEY_COMPARATOR):
-                filtering_criteria = (
-                    zoho.bulk_read.BulkReadJobFilteringCriterion.from_dict(
-                        filtering_criteria_dict
-                    )
-                )
-            elif filtering_criteria_dict.get(zoho.bulk_read.KEY_GROUP):
-                filtering_criteria = (
-                    zoho.bulk_read.BulkReadJobFilteringCriteriaGroup.from_dict(
-                        filtering_criteria_dict
-                    )
-                )
+            key_comparator = filtering_criteria_dict.get(zoho.bulk_read.KEY_COMPARATOR)
+            key_group = filtering_criteria_dict.get(zoho.bulk_read.KEY_GROUP)
+
+            if key_comparator:
+                filtering_criteria = zoho.bulk_read.BulkReadJobFilteringCriterion.from_dict(filtering_criteria_dict)
+            elif key_group:
+                filtering_criteria = zoho.bulk_read.BulkReadJobFilteringCriteriaGroup.from_dict(filtering_criteria_dict)
             else:
                 filtering_criteria = None
         else:

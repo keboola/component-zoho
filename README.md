@@ -48,121 +48,98 @@ Configuration
             - Group operator (group_operator) [REQ] - The operator you want to use to combine the filtering criteria - either `and` or `or`.
 
 
-Sample Configuration
+Sample Configurations
 =============
+Simple configuration
 ```json
 {
-    "parameters": {
-        "region_code": "EU",
-        "client_id": "1000.SECRET_VALUE",
-        "#client_secret": "SECRET_VALUE",
-        "#grant_token": "SECRET_VALUE",
-        "user_email": "john.smith@example.com",
-        "load_mode": "incremental",
-        "module_records_download_configs": [
-            {
-                "output_table_name": "Leads1",
-                "module_name": "Leads"
-            },
-            {
-                "output_table_name": "Leads2",
-                "module_name": "Leads",
-                "field_names": [
-                    "Owner",
-                    "Company",
-                    "First_Name",
-                    "Last_Name",
-                    "Full_Name",
-                    "Designation"
-                ]
-            },
-            {
-                "output_table_name": "Leads3",
-                "module_name": "Leads",
-                "filtering_criteria": {
-                    "field_name": "Created_Time",
-                    "comparator": "not_between",
-                    "value": [
-                        "2022-07-26T15:15:34+02:00",
-                        "2022-07-26T16:58:45+02:00"
-                    ]
+   "parameters":{
+      "account":{
+         "user_email":"component.factory@keboola.com"
+      },
+      "module_records_download_config":{
+         "field_names":[],
+         "module_name":"Leads",
+         "filtering_criteria":{}
+      }
+   },
+   "destination":{
+      "load_mode":"full",
+      "output_table_name":"Leads"
+   }
+}
+```
+Defined field names and filtering criteria
+```json
+{
+   "parameters":{
+      "account":{
+         "user_email":"component.factory@keboola.com"
+      },
+      "module_records_download_config":{
+         "field_names":[
+            "Owner",
+            "Company",
+            "First_Name",
+            "Last_Name",
+            "Full_Name",
+            "Designation"            
+         ],
+         "module_name":"Leads",
+         "filtering_criteria":{
+            "field_name":"Created_Time",
+            "comparator":"between",
+            "value":[
+               "2022-07-26T15:15:34+02:00",
+               "2022-07-26T16:58:45+02:00"
+            ]
+         }
+      }
+   },
+   "destination":{
+      "load_mode":"full",
+      "output_table_name":"Leads"
+   }
+}
+```
+Fitering Groups
+```json
+{
+   "parameters":{
+      "account":{
+         "user_email":"component.factory@keboola.com"
+      },
+      "module_records_download_config":{
+         "field_names":[
+            "Owner",
+            "Company",
+            "First_Name",
+            "Last_Name",
+            "Full_Name",
+            "Designation"            
+         ],
+         "module_name":"Leads",
+        "filtering_criteria": {
+            "group": [
+                {
+                    "field_name": "First_Name",
+                    "comparator": "equal",
+                    "value": "Jan"
+                },
+                {
+                    "field_name": "Last_Name",
+                    "comparator": "equal",
+                    "value": "Stary"
                 }
-            },
-            {
-                "output_table_name": "Leads4",
-                "module_name": "Leads",
-                "filtering_criteria": {
-                    "field_name": "Created_Time",
-                    "comparator": "between",
-                    "value": [
-                        "2022-07-26T15:15:34+02:00",
-                        "2022-07-26T16:58:45+02:00"
-                    ]
-                }
-            },
-            {
-                "output_table_name": "Leads5",
-                "module_name": "Leads",
-                "filtering_criteria": {
-                    "group": [
-                        {
-                            "field_name": "Created_Time",
-                            "comparator": "greater_equal",
-                            "value": "2022-07-26T15:15:34+02:00"
-                        },
-                        {
-                            "field_name": "Created_Time",
-                            "comparator": "less_equal",
-                            "value": "2022-07-26T16:58:45+02:00"
-                        }
-                    ],
-                    "group_operator": "or"
-                }
-            },
-            {
-                "output_table_name": "Leads6",
-                "module_name": "Leads",
-                "filtering_criteria": {
-                    "group": [
-                        {
-                            "field_name": "First_Name",
-                            "comparator": "equal",
-                            "value": "Jan"
-                        },
-                        {
-                            "field_name": "Last_Name",
-                            "comparator": "equal",
-                            "value": "Starý"
-                        }
-                    ],
-                    "group_operator": "or"
-                }
-            },
-            {
-                "output_table_name": "Leads7",
-                "module_name": "Leads",
-                "filtering_criteria": {
-                    "field_name": "Created_Time",
-                    "comparator": "less_equal",
-                    "value": "3 days ago CEST",
-                    "parse_value_as_datetime": true
-                }
-            },
-            {
-                "output_table_name": "Leads8",
-                "module_name": "Leads",
-                "filtering_criteria": {
-                    "field_name": "Created_Time",
-                    "comparator": "between",
-                    "value": [
-                        "3 days ago CEST",
-                        "2 days ago PST"
-                    ],
-                    "parse_value_as_datetime": true
-                }
-            }
-        ]
-    }
+            ],
+            "group_operator": "or"
+        }
+      }
+   },
+   "destination":{
+      "load_mode":"full",
+      "output_table_name":"Leads"
+   }
 }
 ```
 

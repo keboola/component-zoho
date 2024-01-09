@@ -6,7 +6,7 @@
   ],
   "properties": {
     "module_records_download_config": {
-      "title": "Module records download configuration",
+      "title": "Bulk Read Job configuration",
       "type": "object",
       "required": [
         "module_name"
@@ -38,7 +38,7 @@
           "type": "object",
           "title": "Filtering Criteria (optional)",
           "format": "editor",
-          "description": "Filtering criteria is either a single filtering criterion or a filtering criteria group.",
+          "description": "Filtering criteria is either a single filtering criterion or a filtering criteria group. For more information, visit the <a href='https://bitbucket.org/kds_consulting_team/kds-team.ex-zoho/src/master/README.md'>Component's documentation</a>.",
           "propertyOrder": 3
         }
       },

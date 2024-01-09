@@ -47,6 +47,7 @@ Configuration
 
 Sample Configurations
 =============
+
 Simple configuration
 ```json
 {

@@ -44,6 +44,7 @@ class ZohoCRMExtractor(ComponentBase):
 
     def __init__(self):
         super().__init__()
+        self.output_table_name = None
         self.incremental = None
         self.token_store_path = None
         self.state = None
@@ -52,6 +53,7 @@ class ZohoCRMExtractor(ComponentBase):
 
         self.validate_configuration_parameters(REQUIRED_PARAMETERS)
         params: dict = self.configuration.parameters
+
         self.output_table_name = params.get(KEY_GROUP_DESTINATION).get(KEY_OUTPUT_TABLE_NAME)
 
         oauth_credentials = self.configuration.oauth_credentials.data
@@ -70,9 +72,7 @@ class ZohoCRMExtractor(ComponentBase):
             raise UserException("Parameter user_email is mandatory.")
 
         load_mode: str = params.get(KEY_GROUP_DESTINATION, {}).get(KEY_LOAD_MODE, "full_load")
-        module_records_download_config: dict = params[
-            KEY_MODULE_RECORDS_DOWNLOAD_CONFIG
-        ]
+        module_records_download_config: dict = params[KEY_MODULE_RECORDS_DOWNLOAD_CONFIG]
 
         self.incremental: bool = load_mode == "incremental"
 
@@ -85,9 +85,7 @@ class ZohoCRMExtractor(ComponentBase):
         # get last state data/in/state.json from previous run
         self.state = self.get_state_file()
         token_store_content: str = self.state.get(KEY_TOKEN_STORE_CONTENT, "")
-        zoho.initialization.set_filestore_file(
-            self.token_store_path, token_store_content
-        )
+        zoho.initialization.set_filestore_file(self.token_store_path, token_store_content)
 
         try:
             zoho.initialization.initialize(
@@ -100,9 +98,7 @@ class ZohoCRMExtractor(ComponentBase):
                 file_store_path=self.token_store_path,
             )
         except Exception as e:
-            raise UserException(
-                "Zoho Python SDK initialization failed.\nReason:\n" + str(e)
-            ) from e
+            raise UserException("Zoho Python SDK initialization failed.\nReason:\n" + str(e)) from e
 
         self.process_module_records_download_config(module_records_download_config)
 
@@ -116,6 +112,7 @@ class ZohoCRMExtractor(ComponentBase):
         field_names: Optional[List[str]] = config.get(KEY_FIELD_NAMES)
         filtering_criteria_dict: Optional[dict] = config.get(KEY_FILTERING_CRITERIA)
 
+        filtering_criteria = None
         if filtering_criteria_dict:
             key_comparator = filtering_criteria_dict.get(zoho.bulk_read.KEY_COMPARATOR)
             key_group = filtering_criteria_dict.get(zoho.bulk_read.KEY_GROUP)
@@ -124,10 +121,6 @@ class ZohoCRMExtractor(ComponentBase):
                 filtering_criteria = zoho.bulk_read.BulkReadJobFilteringCriterion.from_dict(filtering_criteria_dict)
             elif key_group:
                 filtering_criteria = zoho.bulk_read.BulkReadJobFilteringCriteriaGroup.from_dict(filtering_criteria_dict)
-            else:
-                filtering_criteria = None
-        else:
-            filtering_criteria = None
 
         table_def = self.create_out_table_definition(
             name=f"{self.output_table_name}.csv",
@@ -137,9 +130,7 @@ class ZohoCRMExtractor(ComponentBase):
         )
 
         os.makedirs(table_def.full_path, exist_ok=True)
-        logging.info(
-            f"Attempting to download data for output table {self.output_table_name}."
-        )
+        logging.info(f"Attempting to download data for output table {self.output_table_name}.")
 
         try:
             bulk_read_job = zoho.bulk_read.BulkReadJobBatch(
@@ -151,9 +142,7 @@ class ZohoCRMExtractor(ComponentBase):
             )
             bulk_read_job.download_all_pages()
         except Exception as e:
-            raise UserException(
-                "Failed to download data from Zoho API.\nReason:\n" + str(e)
-            ) from e
+            raise UserException("Failed to download data from Zoho API.\nReason:\n" + str(e)) from e
 
         table_def.columns = bulk_read_job.field_names
         self.write_manifest(table_def)

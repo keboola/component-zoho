@@ -27,13 +27,10 @@ If you need more endpoints, please submit your request to
 
 Configuration
 =============
- - Zoho account region code (region_code) - [REQ] Region code of your Zoho CRM data center.
- - Account's client ID (client_id) - [REQ] Client ID of the Self Client you registered using the Zoho API console.
- - Account's client secret (#client_secret) - [REQ] Client secret of the Self Client you registered using the Zoho API console.
- - Account's grant token (#grant_token) - [REQ] Grant token you generated for the Self Client you registered using the Zoho API console.
+
  - Account's user email (user_email) - [REQ] User email you used to generate the Self Client.
  - Load mode (load_mode) - [REQ] Keboola Connection table load mode.
- - Module records download configurations (module_records_download_configs) - [REQ] List of configurations for the records download job batches.
+ - Module records download configuration (module_records_download_config) - [REQ] job configuration
     - Output table name (output_table_name) [REQ] - The name of the table that should be created or updated in Keboola Connection storage.
     - Module name (module_name) [REQ] - The API name of the Zoho CRM module you want to extract records from.
     - Field names (field_names) [OPT] - API names of the module records' fields you want to extract. Can be left empty or omitted to download all available fields.

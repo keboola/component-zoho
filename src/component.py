@@ -52,6 +52,7 @@ class ZohoCRMExtractor(ComponentBase):
 
         self.validate_configuration_parameters(REQUIRED_PARAMETERS)
         params: dict = self.configuration.parameters
+        self.output_table_name = params.get(KEY_GROUP_DESTINATION).get(KEY_OUTPUT_TABLE_NAME)
 
         oauth_credentials = self.configuration.oauth_credentials.data
         if not oauth_credentials:
@@ -66,7 +67,7 @@ class ZohoCRMExtractor(ComponentBase):
 
         user_email: str = params.get(KEY_GROUP_ACCOUNT, {}).get(KEY_USER_EMAIL)
         if not user_email:
-            raise UserException(f"Parameter user_email is mandatory.")
+            raise UserException("Parameter user_email is mandatory.")
 
         load_mode: str = params.get(KEY_GROUP_DESTINATION, {}).get(KEY_LOAD_MODE, "full_load")
         module_records_download_config: dict = params[
@@ -111,7 +112,6 @@ class ZohoCRMExtractor(ComponentBase):
         asks Zoho API to prepare the data for download and then downloads the data as sliced CSV.
         Also creates appropriate manifest files.
         """
-        output_table_name: str = config[KEY_OUTPUT_TABLE_NAME]
         module_name: str = config[KEY_MODULE_NAME]
         field_names: Optional[List[str]] = config.get(KEY_FIELD_NAMES)
         filtering_criteria_dict: Optional[dict] = config.get(KEY_FILTERING_CRITERIA)
@@ -135,7 +135,7 @@ class ZohoCRMExtractor(ComponentBase):
             filtering_criteria = None
 
         table_def = self.create_out_table_definition(
-            name=f"{output_table_name}.csv",
+            name=f"{self.output_table_name}.csv",
             incremental=self.incremental,
             primary_key=[ID_COLUMN_NAME],
             is_sliced=True,
@@ -143,7 +143,7 @@ class ZohoCRMExtractor(ComponentBase):
 
         os.makedirs(table_def.full_path, exist_ok=True)
         logging.info(
-            f"Attempting to download data for output table {output_table_name}."
+            f"Attempting to download data for output table {self.output_table_name}."
         )
 
         try:

@@ -15,7 +15,7 @@ from keboola.component.sync_actions import SelectElement
 import zoho.initialization
 import zoho.bulk_read
 
-from zcrmsdk.src.com.zoho.crm.api.modules import ModulesOperations, GetModulesHeader
+from zcrmsdk.src.com.zoho.crm.api.modules import ModulesOperations
 
 # Configuration variables
 KEY_GROUP_ACCOUNT = "account"

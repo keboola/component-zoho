@@ -18,12 +18,9 @@
             "description": "Use sync action to get a list of available modules.",
             "propertyOrder": 1,
             "options": {
-              "dependencies": {
-                "account_type": "sharepoint"
-              },
               "async": {
-                "label": "List Libraries",
-                "action": "listLibraries"
+                "label": "List Modules",
+                "action": "listModules"
               }
             },
             "items": {

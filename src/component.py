@@ -8,11 +8,14 @@ from typing import List, Optional
 import os
 import json
 
-from keboola.component.base import ComponentBase
+from keboola.component.base import ComponentBase, sync_action
 from keboola.component.exceptions import UserException
+from keboola.component.sync_actions import SelectElement
 
 import zoho.initialization
 import zoho.bulk_read
+
+from zcrmsdk.src.com.zoho.crm.api.modules import ModulesOperations, GetModulesHeader
 
 # Configuration variables
 KEY_GROUP_ACCOUNT = "account"
@@ -30,9 +33,6 @@ REQUIRED_PARAMETERS = [
     KEY_MODULE_RECORDS_DOWNLOAD_CONFIG,
 ]
 
-# State variables
-KEY_TOKEN_STORE_CONTENT = "#token_store_content"
-
 # Other constants
 REGION_CODE = "EU"
 TMP_DATA_DIR_NAME = "tmp_data"
@@ -47,60 +47,15 @@ class ZohoCRMExtractor(ComponentBase):
         self.output_table_name = None
         self.incremental = None
         self.token_store_path = None
-        self.state = None
 
     def run(self):
 
         self.validate_configuration_parameters(REQUIRED_PARAMETERS)
-        params: dict = self.configuration.parameters
 
-        self.output_table_name = params.get(KEY_GROUP_DESTINATION).get(KEY_OUTPUT_TABLE_NAME)
+        self._init_params()
+        self._init_client()
 
-        oauth_credentials = self.configuration.oauth_credentials.data
-        if not oauth_credentials:
-            raise UserException("oAuth credentials are not available. Please authorize the extractor.")
-
-        credentials = (self.configuration.config_data.get("authorization", {}).get("oauth_api", {})
-                       .get("credentials", {}))
-        credentials_data = json.loads(credentials.get("#data"))
-        refresh_token = credentials_data.get("refresh_token")
-        client_id = credentials.get("appKey")
-        client_secret = credentials.get("#appSecret")
-
-        user_email: str = params.get(KEY_GROUP_ACCOUNT, {}).get(KEY_USER_EMAIL)
-        if not user_email:
-            raise UserException("Parameter user_email is mandatory.")
-
-        load_mode: str = params.get(KEY_GROUP_DESTINATION, {}).get(KEY_LOAD_MODE, "full_load")
-        module_records_download_config: dict = params[KEY_MODULE_RECORDS_DOWNLOAD_CONFIG]
-
-        self.incremental: bool = load_mode == "incremental"
-
-        # Create directory for temporary data (Zoho SDK logging and token store)
-        data_dir_path = Path(self.data_folder_path)
-        tmp_dir_path = data_dir_path / TMP_DATA_DIR_NAME
-        tmp_dir_path.mkdir(parents=True, exist_ok=True)
-        self.token_store_path = tmp_dir_path / TOKEN_STORE_FILE_NAME
-
-        # get last state data/in/state.json from previous run
-        self.state = self.get_state_file()
-        token_store_content: str = self.state.get(KEY_TOKEN_STORE_CONTENT, "")
-        zoho.initialization.set_filestore_file(self.token_store_path, token_store_content)
-
-        try:
-            zoho.initialization.initialize(
-                client_id=client_id,
-                client_secret=client_secret,
-                refresh_token=refresh_token,
-                region_code=REGION_CODE,
-                user_email=user_email,
-                tmp_dir_path=tmp_dir_path,
-                file_store_path=self.token_store_path,
-            )
-        except Exception as e:
-            raise UserException("Zoho Python SDK initialization failed.\nReason:\n" + str(e)) from e
-
-        self.process_module_records_download_config(module_records_download_config)
+        self.process_module_records_download_config(self.module_records_download_config)
 
     def process_module_records_download_config(self, config: dict):
         """
@@ -142,6 +97,7 @@ class ZohoCRMExtractor(ComponentBase):
                 field_names=field_names,
                 filtering_criteria=filtering_criteria,
             )
+
             bulk_read_job.download_all_pages()
         except Exception as e:
             raise UserException("Failed to download data from Zoho API.\nReason:\n" + str(e)) from e
@@ -156,6 +112,75 @@ class ZohoCRMExtractor(ComponentBase):
         for key in criteria:
             if key not in allowed_keys:
                 raise UserException(f"{key} is not a valid filter key.")
+
+    def get_modules(self) -> list:
+        modules_operations = ModulesOperations()
+        response = modules_operations.get_modules()
+
+        if response.get_status_code() == 200:
+            data = response.get_object()
+
+            module_names = []
+            for module in data._ResponseWrapper__modules:
+                module_names.append(module._Module__api_name)
+        else:
+            raise UserException("Cannot fetch the list of available Modules.")
+
+        return module_names
+
+    def _init_client(self):
+        self.token_store_path = self.tmp_dir_path / TOKEN_STORE_FILE_NAME
+        zoho.initialization.set_filestore_file(self.token_store_path, "")
+        try:
+            zoho.initialization.initialize(
+                client_id=self.client_id,
+                client_secret=self.client_secret,
+                refresh_token=self.refresh_token,
+                region_code=REGION_CODE,
+                user_email=self.user_email,
+                tmp_dir_path=self.tmp_dir_path,
+                file_store_path=self.token_store_path,
+            )
+        except Exception as e:
+            raise UserException("Zoho Python SDK initialization failed.\nReason:\n" + str(e)) from e
+
+    def _init_params(self):
+        params: dict = self.configuration.parameters
+
+        self.output_table_name = params.get(KEY_GROUP_DESTINATION).get(KEY_OUTPUT_TABLE_NAME)
+
+        oauth_credentials = self.configuration.oauth_credentials.data
+        if not oauth_credentials:
+            raise UserException("oAuth credentials are not available. Please authorize the extractor.")
+
+        credentials = (self.configuration.config_data.get("authorization", {}).get("oauth_api", {})
+                       .get("credentials", {}))
+        credentials_data = json.loads(credentials.get("#data"))
+        self.refresh_token = credentials_data.get("refresh_token")
+        self.client_id = credentials.get("appKey")
+        self.client_secret = credentials.get("#appSecret")
+
+        self.user_email: str = params.get(KEY_GROUP_ACCOUNT, {}).get(KEY_USER_EMAIL)
+        if not self.user_email:
+            raise UserException("Parameter user_email is mandatory.")
+
+        load_mode: str = params.get(KEY_GROUP_DESTINATION, {}).get(KEY_LOAD_MODE, "full_load")
+        self.incremental: bool = load_mode == "incremental"
+
+        self.module_records_download_config: dict = params[KEY_MODULE_RECORDS_DOWNLOAD_CONFIG]
+
+        # Create directory for temporary data (Zoho SDK logging and token store)
+        data_dir_path = Path(self.data_folder_path)
+        self.tmp_dir_path = data_dir_path / TMP_DATA_DIR_NAME
+        self.tmp_dir_path.mkdir(parents=True, exist_ok=True)
+
+    @sync_action("listModules")
+    def list_modules(self) -> List[SelectElement]:
+        self._init_params()
+        self._init_client()
+
+        modules = self.get_modules()
+        return [SelectElement(label=module, value=module) for module in modules]
 
 
 """

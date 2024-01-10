@@ -12,12 +12,26 @@
         "module_name"
       ],
       "properties": {
-        "module_name": {
-          "title": "Module API name",
-          "type": "string",
-          "minLength": 1,
-          "propertyOrder": 1
-        },
+          "module_name": {
+            "type": "string",
+            "title": "Module API name",
+            "description": "Use sync action to get a list of available modules.",
+            "propertyOrder": 1,
+            "options": {
+              "dependencies": {
+                "account_type": "sharepoint"
+              },
+              "async": {
+                "label": "List Libraries",
+                "action": "listLibraries"
+              }
+            },
+            "items": {
+                "enum": [],
+                "type": "string"
+            },
+            "enum": []
+          },
         "field_names": {
           "title": "Fields (optional)",
           "description": "List of field names to be downloaded",

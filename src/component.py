@@ -16,6 +16,9 @@ import zoho.initialization
 import zoho.bulk_read
 
 from zcrmsdk.src.com.zoho.crm.api.modules import ModulesOperations
+from zcrmsdk.src.com.zoho.crm.api.fields import FieldsOperations
+from zcrmsdk.src.com.zoho.crm.api import ParameterMap
+
 
 # Configuration variables
 KEY_GROUP_ACCOUNT = "account"
@@ -49,7 +52,6 @@ class ZohoCRMExtractor(ComponentBase):
         self.token_store_path = None
 
     def run(self):
-
         self.validate_configuration_parameters(REQUIRED_PARAMETERS)
 
         self._init_params()
@@ -115,10 +117,43 @@ class ZohoCRMExtractor(ComponentBase):
 
     def get_modules(self) -> list:
         modules_operations = ModulesOperations()
-        response = modules_operations.get_modules()
+        r = modules_operations.get_modules()
 
-        if response.get_status_code() == 200:
-            data = response.get_object()
+        if r.get_status_code() == 200:
+            data = r.get_object()
+
+            module_names = []
+            for module in data._ResponseWrapper__modules:
+                module_names.append(module._Module__api_name)
+        else:
+            raise UserException("Cannot fetch the list of available Modules.")
+
+        return module_names
+
+    def get_fields(self, module_api_name: str) -> list:
+        fields_operations = FieldsOperations(module_api_name)
+        param_instance = ParameterMap()
+
+        r = fields_operations.get_fields(param_instance)
+
+        if r.get_status_code() == 200:
+            data = r.get_object()
+
+            module_names = []
+            for module in data._ResponseWrapper__fields:
+                module_names.append(module._Field__api_name)
+        else:
+            raise UserException("Cannot fetch the list of available Modules.")
+
+        return module_names
+
+    def get_modules(self) -> list:
+        modules_operations = ModulesOperations()
+
+        r = modules_operations.get_modules()
+
+        if r.get_status_code() == 200:
+            data = r.get_object()
 
             module_names = []
             for module in data._ResponseWrapper__modules:
@@ -180,6 +215,18 @@ class ZohoCRMExtractor(ComponentBase):
         self._init_client()
 
         modules = self.get_modules()
+        return [SelectElement(label=module, value=module) for module in modules]
+
+    @sync_action("listFields")
+    def list_fields(self) -> List[SelectElement]:
+        self._init_params()
+        self._init_client()
+
+        module_name = self.module_records_download_config[KEY_MODULE_NAME]
+        if not module_name:
+            raise UserException("To list available fields, module_name parameter must be set.")
+
+        modules = self.get_fields(module_name)
         return [SelectElement(label=module, value=module) for module in modules]
 
 

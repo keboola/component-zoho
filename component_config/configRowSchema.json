@@ -80,13 +80,12 @@
         "incremental_field": {
           "type": "string",
           "title": "Incremental Field",
-          "default": "LastModified",
           "description": "Field/column to be used for incremental fetching",
           "propertyOrder": 20,
           "options": {
             "async": {
-              "label": "List Fields",
-              "action": "listFields"
+              "label": "List DateTime Fields",
+              "action": "listFieldsDatetime"
             },
             "dependencies": {
               "sync_mode": "incremental_sync"

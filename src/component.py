@@ -212,12 +212,12 @@ class ZohoCRMExtractor(ComponentBase):
             filtering_criteria_dict = None
         elif sync_mode == "advanced":
             filtering_criteria_dict = sync_options.get(KEY_FILTERING_CRITERIA)
+            self.validate_filtering_criteria(filtering_criteria_dict)
         elif sync_mode == "incremental_sync":
             filtering_criteria_dict = self._get_incremental_sync_filter(sync_options)
         else:
             raise UserException(f"Unsupported sync_mode: {sync_mode}")
 
-        self.validate_filtering_criteria(filtering_criteria_dict)
         return filtering_criteria_dict
 
     def _get_incremental_sync_filter(self, sync_options: dict) -> dict:

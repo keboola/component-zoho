@@ -115,22 +115,8 @@ class ZohoCRMExtractor(ComponentBase):
             if key not in allowed_keys:
                 raise UserException(f"{key} is not a valid filter key.")
 
-    def get_modules(self) -> list:
-        modules_operations = ModulesOperations()
-        r = modules_operations.get_modules()
-
-        if r.get_status_code() == 200:
-            data = r.get_object()
-
-            module_names = []
-            for module in data._ResponseWrapper__modules:
-                module_names.append(module._Module__api_name)
-        else:
-            raise UserException("Cannot fetch the list of available Modules.")
-
-        return module_names
-
-    def get_fields(self, module_api_name: str) -> list:
+    @staticmethod
+    def get_fields(module_api_name: str) -> list:
         fields_operations = FieldsOperations(module_api_name)
         param_instance = ParameterMap()
 
@@ -147,7 +133,8 @@ class ZohoCRMExtractor(ComponentBase):
 
         return module_names
 
-    def get_modules(self) -> list:
+    @staticmethod
+    def get_modules() -> list:
         modules_operations = ModulesOperations()
 
         r = modules_operations.get_modules()

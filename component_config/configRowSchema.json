@@ -135,7 +135,7 @@
         },
         "filtering_criteria": {
           "type": "object",
-          "title": "Filtering Criteria (optional)",
+          "title": "Filtering Criteria",
           "format": "editor",
           "description": "Filtering criteria is either a single filtering criterion or a filtering criteria group. For more information, visit the <a href='https://bitbucket.org/kds_consulting_team/kds-team.ex-zoho/src/master/README.md'>Component's documentation</a>.",
           "propertyOrder": 50,

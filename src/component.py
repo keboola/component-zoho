@@ -37,7 +37,7 @@ KEY_SYNC_MODE = "sync_mode"
 KEY_FILTERING_CRITERIA = "filtering_criteria"
 
 
-REQUIRED_PARAMETERS = [KEY_MODULE_RECORDS_DOWNLOAD_CONFIG]
+REQUIRED_PARAMETERS = [KEY_MODULE_RECORDS_DOWNLOAD_CONFIG, KEY_GROUP_SYNC_OPTIONS]
 
 # Other constants
 REGION_CODE = "EU"
@@ -128,7 +128,7 @@ class ZohoCRMExtractor(ComponentBase):
         response = fields_operations.get_fields(param_instance)
 
         if response.get_status_code() != 200:
-            raise UserException("Cannot fetch the list of available Fields.")
+            raise UserException(f"Cannot fetch the list of available Fields for module {module_api_name}")
 
         data = response.get_object()
 
@@ -282,6 +282,7 @@ class ZohoCRMExtractor(ComponentBase):
         modules = self.get_modules()
         if not modules:
             raise UserException("Cannot list modules.")
+
         return [SelectElement(label=module, value=module) for module in modules]
 
     @sync_action("listFields")

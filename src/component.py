@@ -128,7 +128,8 @@ class ZohoCRMExtractor(ComponentBase):
         response = fields_operations.get_fields(param_instance)
 
         if response.get_status_code() != 200:
-            raise UserException(f"Cannot fetch the list of available Fields for module {module_api_name}")
+            raise UserException(f"Cannot fetch the list of available Fields for module {module_api_name}. "
+                                f"Received status code: {response._APIResponse__status_code}")
 
         data = response.get_object()
 
@@ -146,7 +147,8 @@ class ZohoCRMExtractor(ComponentBase):
         response = modules_operations.get_modules()
 
         if response.get_status_code() != 200:
-            raise UserException("Cannot fetch the list of available Modules.")
+            raise UserException(f"Cannot fetch the list of available Modules. "
+                                f"Received status code: {response.__APIResponse__status_code}")
 
         data = response.get_object()
 

@@ -125,34 +125,41 @@ class ZohoCRMExtractor(ComponentBase):
         fields_operations = FieldsOperations(module_api_name)
         param_instance = ParameterMap()
 
-        r = fields_operations.get_fields(param_instance)
+        response = fields_operations.get_fields(param_instance)
 
-        if r.get_status_code() == 200:
-            data = r.get_object()
-
-            module_names = []
-            for module in data._ResponseWrapper__fields:
-                if (not datetype) or (datetype and datetype == module._Field__data_type):
-                    module_names.append(module._Field__api_name)
-        else:
+        if response.get_status_code() != 200:
             raise UserException("Cannot fetch the list of available Fields.")
 
-        return module_names
+        data = response.get_object()
+
+        field_names = [
+            field._Field__api_name
+            for field in getattr(data, '_ResponseWrapper__fields', [])
+            if not datetype or (datetype and datetype == field._Field__data_type)
+        ]
+
+        if not field_names:
+            raise UserException("Cannot fetch the list of available Fields.")
+
+        return field_names
 
     @staticmethod
     def get_modules() -> list:
         modules_operations = ModulesOperations()
+        response = modules_operations.get_modules()
 
-        r = modules_operations.get_modules()
-
-        if r.get_status_code() == 200:
-            data = r.get_object()
-
-            module_names = []
-            for module in data._ResponseWrapper__modules:
-                module_names.append(module._Module__api_name)
-        else:
+        if response.get_status_code() != 200:
             raise UserException("Cannot fetch the list of available Modules.")
+
+        data = response.get_object()
+
+        module_names = [
+            module._Module__api_name
+            for module in getattr(data, '_ResponseWrapper__modules', [])
+        ]
+
+        if not module_names:
+            raise UserException("Cannot fetch the list of available Fields.")
 
         return module_names
 

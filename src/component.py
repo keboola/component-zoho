@@ -53,6 +53,8 @@ class ZohoCRMExtractor(ComponentBase):
         self.output_table_name = None
         self.incremental = None
         self.token_store_path = None
+        self.statefile = self.get_state_file()
+        self.ts_start = self.generate_timestamp()
 
     def run(self):
         self.validate_configuration_parameters(REQUIRED_PARAMETERS)
@@ -61,6 +63,8 @@ class ZohoCRMExtractor(ComponentBase):
         self._init_client()
 
         self.process_module_records_download_config(self.module_records_download_config)
+
+        self.write_state_file({"last_run": self.ts_start})
 
     def process_module_records_download_config(self, config: dict):
         """
@@ -217,13 +221,23 @@ class ZohoCRMExtractor(ComponentBase):
         return filtering_criteria_dict
 
     def _get_incremental_sync_filter(self, sync_options: dict) -> dict:
-        value = dateparser.parse(sync_options.get("value"))
-        formatted_date = self._format_datetime_with_offset(value)
+        value = sync_options.get("value")
+
+        if value == "last_run":
+            timestamp = self.statefile.get("last_run")
+            if not timestamp:
+                logging.warning(f"Last run timestamp not found in statefile, performing full sync.")
+                return {}
+            else:
+                logging.info(f"Using timestamp from statefile: {timestamp}")
+        else:
+            value = dateparser.parse(value)
+            timestamp = self._format_datetime_with_offset(value)
 
         return {
             "field_name": sync_options.get("incremental_field"),
             "comparator": sync_options.get("operator"),
-            "value": formatted_date
+            "value": timestamp
         }
 
     @staticmethod
@@ -231,6 +245,19 @@ class ZohoCRMExtractor(ComponentBase):
         date_str = dt.strftime("%Y-%m-%dT%H:%M:%S")
         timezone_offset = datetime.now(timezone.utc).astimezone().strftime('%z')
         return f"{date_str}{timezone_offset}"
+
+    @staticmethod
+    def generate_timestamp() -> str:
+        """
+        Generate a timestamp for the current time in the format: YYYY-MM-DDTHH:MM:SS+HHMM
+        Returns:
+            str: Formatted timestamp
+        """
+        current_datetime = datetime.now(timezone.utc)
+        formatted_date = current_datetime.strftime("%Y-%m-%dT%H:%M:%S")
+        timezone_offset = current_datetime.strftime('%z')
+        result = f"{formatted_date}{timezone_offset}"
+        return result
 
     def _list_fields(self, datetype: str = None) -> List[SelectElement]:
         self._init_params()

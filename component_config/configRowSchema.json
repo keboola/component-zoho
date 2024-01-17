@@ -100,15 +100,10 @@
         "operator": {
           "type": "string",
           "title": "Operator",
+          "default": "less_equal",
           "description": "The operator you want to use to filter the field.",
           "propertyOrder": 30,
           "enum": [
-            "equal",
-            "not_equal",
-            "in",
-            "not_in",
-            "between",
-            "not_between",
             "greater_than",
             "greater_equal",
             "less_than",
@@ -119,12 +114,6 @@
               "sync_mode": "incremental_sync"
             },
             "enum_titles": [
-              "Equals",
-              "Not equals",
-              "In",
-              "Not in",
-              "Between",
-              "Not between",
               "Greater than",
               "Greater than or equal to",
               "Less than",
@@ -136,7 +125,7 @@
           "type": "string",
           "title": "Value",
           "default": "now",
-          "description": "Either date in YYYY-MM-DD format or dateparser string i.e. 5 days ago, 1 month ago, now, etc.",
+          "description": "Either date in YYYY-MM-DD format or dateparser string i.e. 5 days ago, 1 month ago, last_run, now, etc.",
           "propertyOrder": 40,
           "options": {
             "dependencies": {

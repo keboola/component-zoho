@@ -138,9 +138,6 @@ class ZohoCRMExtractor(ComponentBase):
             if not datetype or (datetype and datetype == field._Field__data_type)
         ]
 
-        if not field_names:
-            raise UserException("Cannot fetch the list of available Fields.")
-
         return field_names
 
     @staticmethod
@@ -157,9 +154,6 @@ class ZohoCRMExtractor(ComponentBase):
             module._Module__api_name
             for module in getattr(data, '_ResponseWrapper__modules', [])
         ]
-
-        if not module_names:
-            raise UserException("Cannot fetch the list of available Fields.")
 
         return module_names
 
@@ -274,8 +268,11 @@ class ZohoCRMExtractor(ComponentBase):
         if not module_name:
             raise UserException("To list available fields, module_name parameter must be set.")
 
-        modules = self.get_fields(module_name, datetype=datetype)
-        return [SelectElement(label=module, value=module) for module in modules]
+        fields = self.get_fields(module_name, datetype=datetype)
+        if not fields:
+            raise UserException("Cannot list fields.")
+
+        return [SelectElement(label=field, value=field) for field in fields]
 
     @sync_action("listModules")
     def list_modules(self) -> List[SelectElement]:
@@ -283,6 +280,8 @@ class ZohoCRMExtractor(ComponentBase):
         self._init_client()
 
         modules = self.get_modules()
+        if not modules:
+            raise UserException("Cannot list modules.")
         return [SelectElement(label=module, value=module) for module in modules]
 
     @sync_action("listFields")

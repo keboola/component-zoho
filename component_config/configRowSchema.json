@@ -12,57 +12,160 @@
         "module_name"
       ],
       "properties": {
-          "module_name": {
-            "type": "string",
-            "title": "Module API name",
-            "description": "Use sync action to get a list of available modules.",
-            "propertyOrder": 1,
-            "options": {
-              "async": {
-                "label": "List Modules",
-                "action": "listModules"
-              }
-            },
-            "items": {
-                "enum": [],
-                "type": "string"
-            },
-            "enum": []
-          },
-        "field_names": {
+        "module_name": {
           "type": "string",
+          "title": "Module API name",
+          "description": "Use sync action to get a list of available modules.",
+          "propertyOrder": 1,
+          "options": {
+            "async": {
+              "label": "List Modules",
+              "action": "listModules"
+            }
+          },
+          "items": {
+            "enum": [],
+            "type": "string"
+          },
+          "enum": []
+        },
+        "field_names": {
+          "type": "array",
+          "format": "select",
           "title": "Fields (optional)",
           "description": "List of field names to be downloaded",
           "propertyOrder": 2,
           "options": {
-              "async": {
-                "label": "List Fields",
-                "action": "listFields"
-              }
-            },
-          "items": {
-                "enum": [],
-                "type": "string"
+            "async": {
+              "label": "List Fields",
+              "action": "listFields"
+            }
           },
-          "enum": []
-        },
-        "filtering_criteria": {
-          "type": "object",
-          "title": "Filtering Criteria (optional)",
-          "format": "editor",
-          "description": "Filtering criteria is either a single filtering criterion or a filtering criteria group. For more information, visit the <a href='https://bitbucket.org/kds_consulting_team/kds-team.ex-zoho/src/master/README.md'>Component's documentation</a>.",
-          "propertyOrder": 3
+          "items": {
+            "enum": [],
+            "type": "string"
+          },
+          "uniqueItems": true
         }
       },
       "minItems": 1,
       "uniqueItems": true,
       "propertyOrder": 1
     },
+    "sync_options": {
+      "type": "object",
+      "title": "Sync Options",
+      "propertyOrder": 2,
+      "properties": {
+        "sync_mode": {
+          "type": "string",
+          "required": true,
+          "title": "Sync Mode",
+          "enum": [
+            "full_sync",
+            "incremental_sync",
+            "advanced"
+          ],
+          "options": {
+            "enum_titles": [
+              "Full Sync",
+              "Incremental Sync",
+              "Advanced"
+            ]
+          },
+          "default": "full_sync",
+          "description": "Full Sync downloads all data from the source every run, Incremental Sync downloads data created or updated in a specified time range and Advanced option enables custom filtering.",
+          "propertyOrder": 10
+        },
+        "incremental_field": {
+          "type": "string",
+          "title": "Incremental Field",
+          "default": "LastModified",
+          "description": "Field/column to be used for incremental fetching",
+          "propertyOrder": 20,
+          "options": {
+            "async": {
+              "label": "List Fields",
+              "action": "listFields"
+            },
+            "dependencies": {
+              "sync_mode": "incremental_sync"
+            }
+          },
+          "items": {
+            "enum": [],
+            "type": "string"
+          },
+          "enum": []
+        },
+        "operator": {
+          "type": "string",
+          "title": "Operator",
+          "description": "The operator you want to use to filter the field.",
+          "propertyOrder": 30,
+          "enum": [
+            "equal",
+            "not_equal",
+            "in",
+            "not_in",
+            "between",
+            "not_between",
+            "greater_than",
+            "greater_equal",
+            "less_than",
+            "less_equal"
+          ],
+          "options": {
+            "dependencies": {
+              "sync_mode": "incremental_sync"
+            },
+            "enum_titles": [
+              "Equals",
+              "Not equals",
+              "In",
+              "Not in",
+              "Between",
+              "Not between",
+              "Greater than",
+              "Greater than or equal to",
+              "Less than",
+              "Less than or equal to"
+            ]
+          }
+        },
+        "value": {
+          "type": "string",
+          "title": "Value",
+          "default": "now",
+          "description": "Either date in YYYY-MM-DD format or dateparser string i.e. 5 days ago, 1 month ago, now, etc.",
+          "propertyOrder": 40,
+          "options": {
+            "dependencies": {
+              "sync_mode": "incremental_sync"
+            }
+          }
+        },
+        "filtering_criteria": {
+          "type": "object",
+          "title": "Filtering Criteria (optional)",
+          "format": "editor",
+          "description": "Filtering criteria is either a single filtering criterion or a filtering criteria group. For more information, visit the <a href='https://bitbucket.org/kds_consulting_team/kds-team.ex-zoho/src/master/README.md'>Component's documentation</a>.",
+          "propertyOrder": 50,
+          "options": {
+            "dependencies": {
+              "sync_mode": "advanced"
+            }
+          }
+        }
+      }
+    },
     "destination": {
       "title": "Destination settings",
       "type": "object",
-      "required": ["output_table_name"],
-      "propertyOrder": 2,
+      "required": [
+        "output_table_name"
+      ],
+      "propertyOrder": 3,
       "properties": {
         "load_mode": {
           "title": "Load mode",

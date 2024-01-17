@@ -129,7 +129,7 @@ class ZohoCRMExtractor(ComponentBase):
             for module in data._ResponseWrapper__fields:
                 module_names.append(module._Field__api_name)
         else:
-            raise UserException("Cannot fetch the list of available Modules.")
+            raise UserException("Cannot fetch the list of available Fields.")
 
         return module_names
 

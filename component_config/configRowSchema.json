@@ -30,20 +30,21 @@
             "enum": []
           },
         "field_names": {
+          "type": "string",
           "title": "Fields (optional)",
           "description": "List of field names to be downloaded",
-          "type": "array",
-          "format": "select",
-          "items": {
-            "title": "Field API name",
-            "type": "string",
-            "minLength": 1
-          },
+          "propertyOrder": 2,
           "options": {
-            "tags": true
+              "async": {
+                "label": "List Fields",
+                "action": "listFields"
+              }
+            },
+          "items": {
+                "enum": [],
+                "type": "string"
           },
-          "uniqueItems": true,
-          "propertyOrder": 2
+          "enum": []
         },
         "filtering_criteria": {
           "type": "object",

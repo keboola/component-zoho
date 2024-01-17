@@ -31,19 +31,20 @@ Configuration
  - Account's user email (user_email) - [REQ] User email you used to generate the Self Client.
  - Load mode (load_mode) - [REQ] Keboola Connection table load mode.
  - Module records download configuration (module_records_download_config) - [REQ] job configuration
-    - Output table name (output_table_name) [REQ] - The name of the table that should be created or updated in Keboola Connection storage.
     - Module name (module_name) [REQ] - The API name of the Zoho CRM module you want to extract records from.
     - Field names (field_names) [OPT] - API names of the module records' fields you want to extract. Can be left empty or omitted to download all available fields.
-    - Filtering criteria (filtering_criteria) [OPT] - Filtering criteria enable you to filter the downloaded records using their fields' values. There is either a single filtering criterion or a filtering criteria group. Can be left empty or omitted to not apply any filtering.
-        - Case of single filtering criterion:
-            - Field name (field_name) [REQ] - The API name of the field you want to filter by.
-            - Operator (operator) [REQ] - The operator you want to use to filter the field.
-            - Value (value) [REQ] - The value you want to use to filter the field. Datetimes must always contain time zone information.
-            - Parse value as datetime (parse_value_as_datetime) [OPT] - If set to `true`, the value will be parsed as datetime using the [dateparser library](https://dateparser.readthedocs.io/en/latest/). Datetimes must always contain time zone information.
-        - Case of filtering criteria group:
-            - Group (group) [REQ] - List of simple filering criteria (see above).
-            - Group operator (group_operator) [REQ] - The operator you want to use to combine the filtering criteria - either `and` or `or`.
-
+ - Sync Options (sync_options) [REQ] - There are three modes available: Full Sync, Incremental Sync and Advanced, where you can set up custom filtering.
+   - Filtering criteria (filtering_criteria) [OPT] - Filtering criteria enable you to filter the downloaded records using their fields' values. There is either a single filtering criterion or a filtering criteria group. Can be left empty or omitted to not apply any filtering.
+       - Case of single filtering criterion:
+           - Field name (field_name) [REQ] - The API name of the field you want to filter by.
+           - Operator (operator) [REQ] - The operator you want to use to filter the field.
+           - Value (value) [REQ] - The value you want to use to filter the field. Datetimes must always contain time zone information.
+       - Case of filtering criteria group:
+           - Group (group) [REQ] - List of simple filering criteria (see above).
+           - Group operator (group_operator) [REQ] - The operator you want to use to combine the filtering criteria - either `and` or `or`.
+ - Destination settings [REQ] - Is used to set Keboola Storage behaviour
+     - Output table name (output_table_name) [REQ] - The name of the table that should be created or updated in Keboola Connection storage.
+     - Load mode (load_mode) [REQ] - If Full load is used, the destination table will be overwritten every run. If incremental load is used, data will be upserted into the destination table.
 
 Sample Configurations
 =============
@@ -51,93 +52,88 @@ Sample Configurations
 Simple configuration
 ```json
 {
-   "parameters":{
-      "account":{
-         "user_email":"component.factory@keboola.com"
-      },
-      "module_records_download_config":{
-         "field_names":[],
-         "module_name":"Leads",
-         "filtering_criteria":{}
-      }
-   },
-   "destination":{
-      "load_mode":"full",
-      "output_table_name":"Leads"
-   }
+  "parameters": {    
+    "account": {
+      "user_email": "component.factory@keboola.com"
+    },
+    "module_records_download_config": {
+      "module_name": "Deals",
+      "field_names": []
+    },
+    "sync_options": {
+      "sync_mode": "full_sync",
+      "filtering_criteria": {}
+    },
+    "destination": {
+      "load_mode": "full",
+      "output_table_name": "Leads"
+    }
+  }
 }
 ```
 Defined field names and filtering criteria
 ```json
 {
-   "parameters":{
-      "account":{
-         "user_email":"component.factory@keboola.com"
-      },
-      "module_records_download_config":{
-         "field_names":[
-            "Owner",
-            "Company",
-            "First_Name",
-            "Last_Name",
-            "Full_Name",
-            "Designation"            
-         ],
-         "module_name":"Leads",
-         "filtering_criteria":{
-            "field_name":"Created_Time",
-            "comparator":"between",
-            "value":[
-               "2022-07-26T15:15:34+02:00",
-               "2022-07-26T16:58:45+02:00"
-            ]
-         }
+  "parameters": {
+    "account": {
+      "user_email": "component.factory@keboola.com"
+    },
+    "module_records_download_config": {
+      "module_name": "Leads",
+      "field_names": []
+    },
+    "sync_options": {
+      "sync_mode": "advanced",
+      "filtering_criteria": {
+        "field_name": "Created_Time",
+        "comparator": "between",
+        "value": [
+          "2022-07-26T15:15:34+02:00",
+          "2022-07-26T16:58:45+02:00"
+        ]
       }
-   },
-   "destination":{
-      "load_mode":"full",
-      "output_table_name":"Leads"
-   }
+    },
+    "destination": {
+      "load_mode": "full",
+      "output_table_name": "Leads"
+    }
+  }
 }
 ```
 Fitering Groups
 ```json
 {
-   "parameters":{
-      "account":{
-         "user_email":"component.factory@keboola.com"
-      },
-      "module_records_download_config":{
-         "field_names":[
-            "Owner",
-            "Company",
-            "First_Name",
-            "Last_Name",
-            "Full_Name",
-            "Designation"            
-         ],
-         "module_name":"Leads",
-        "filtering_criteria": {
-            "group": [
-                {
-                    "field_name": "First_Name",
-                    "comparator": "equal",
-                    "value": "Jan"
-                },
-                {
-                    "field_name": "Last_Name",
-                    "comparator": "equal",
-                    "value": "Stary"
-                }
-            ],
-            "group_operator": "or"
-        }
+  "parameters": {
+    "account": {
+      "user_email": "component.factory@keboola.com"
+    },
+    "module_records_download_config": {
+      "module_name": "Leads",
+      "field_names": []
+    },
+    "sync_options": {
+      "sync_mode": "advanced",
+      "filtering_criteria": {
+        "group": [
+          {
+            "field_name": "First_Name",
+            "comparator": "equal",
+            "value": "Jan"
+          },
+          {
+            "field_name": "Last_Name",
+            "comparator": "equal",
+            "value": "Stary"
+          }
+        ],
+        "group_operator": "or"
       }
-   },
-   "destination":{
-      "load_mode":"full",
-      "output_table_name":"Leads"
-   }
+    },
+    "destination": {
+      "load_mode": "full",
+      "output_table_name": "LeadsTest"
+    }
+  }
 }
 ```
 

@@ -226,7 +226,7 @@ class ZohoCRMExtractor(ComponentBase):
         if value == "last_run":
             timestamp = self.statefile.get("last_run")
             if not timestamp:
-                logging.warning(f"Last run timestamp not found in statefile, performing full sync.")
+                logging.warning("Last run timestamp not found in statefile, performing full sync.")
                 return {}
             else:
                 logging.info(f"Using timestamp from statefile: {timestamp}")

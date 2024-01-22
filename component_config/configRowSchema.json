@@ -171,7 +171,7 @@
           "propertyOrder": 3
         },
         "output_table_name": {
-          "title": "Output table name",
+          "title": "Output table name (Optional)",
           "type": "string",
           "minLength": 1,
           "propertyOrder": 1

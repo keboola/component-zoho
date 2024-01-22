@@ -177,8 +177,13 @@ class ZohoCRMExtractor(ComponentBase):
 
     def _init_params(self):
         params: dict = self.configuration.parameters
+        self.module_records_download_config: dict = params[KEY_MODULE_RECORDS_DOWNLOAD_CONFIG]
 
-        self.output_table_name = params.get(KEY_GROUP_DESTINATION).get(KEY_OUTPUT_TABLE_NAME)
+        output_table_name = params.get(KEY_GROUP_DESTINATION, {}).get(KEY_OUTPUT_TABLE_NAME)
+        if not output_table_name:
+            default_table_name = self.module_records_download_config.get(KEY_MODULE_NAME)
+            logging.info(f"Custom output table name not set, defaulting to module name: {default_table_name}")
+            self.output_table_name = default_table_name
 
         oauth_credentials = self.configuration.oauth_credentials.data
         if not oauth_credentials:
@@ -201,7 +206,6 @@ class ZohoCRMExtractor(ComponentBase):
         load_mode: str = params.get(KEY_GROUP_DESTINATION, {}).get(KEY_LOAD_MODE, "full_load")
         self.incremental: bool = load_mode == "incremental"
 
-        self.module_records_download_config: dict = params[KEY_MODULE_RECORDS_DOWNLOAD_CONFIG]
 
         # Create directory for temporary data (Zoho SDK logging and token store)
         data_dir_path = Path(self.data_folder_path)

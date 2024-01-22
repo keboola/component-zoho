@@ -43,7 +43,7 @@ Configuration
            - Group (group) [REQ] - List of simple filering criteria (see above).
            - Group operator (group_operator) [REQ] - The operator you want to use to combine the filtering criteria - either `and` or `or`.
  - Destination settings [REQ] - Is used to set Keboola Storage behaviour
-     - Output table name (output_table_name) [REQ] - The name of the table that should be created or updated in Keboola Connection storage.
+     - Output table name (output_table_name) [OPT] - The name of the table that should be created or updated in Keboola Connection storage. Defaults to Module name.
      - Load mode (load_mode) [REQ] - If Full load is used, the destination table will be overwritten every run. If incremental load is used, data will be upserted into the destination table.
 
 Sample Configurations

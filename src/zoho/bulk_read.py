@@ -19,7 +19,7 @@ from zcrmsdk.src.com.zoho.crm.api.bulk_read import (
     SuccessResponse,
     APIException,
     JobDetail,
-    FileBodyWrapper,
+    FileBodyWrapper
 )
 
 from zcrmsdk.src.com.zoho.crm.api.util import Choice

@@ -1,9 +1,9 @@
-keboola.component==1.3.7
+keboola.component==1.4.3
 keboola.utils
 keboola.http-client
 mock
 freezegun
 jsonschema
-zohocrmsdk2_0
-mysql-connector-python
+zohocrmsdk2_0==5.1.0
 dateparser
+mysql-connector # zoho TokenStore dependency

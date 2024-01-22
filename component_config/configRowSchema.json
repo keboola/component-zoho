@@ -1,6 +1,182 @@
 {
-    "title": "Zoho CRM API (v2) row configuration",
-    "type": "object",
-    "required": [],
-    "properties": {}
+  "title": "Zoho CRM API (v2) row configuration",
+  "type": "object",
+  "required": [
+    "module_records_download_config"
+  ],
+  "properties": {
+    "module_records_download_config": {
+      "title": "Bulk Read Job configuration",
+      "type": "object",
+      "required": [
+        "module_name"
+      ],
+      "properties": {
+        "module_name": {
+          "type": "string",
+          "title": "Module API name",
+          "description": "Use sync action to get a list of available modules.",
+          "propertyOrder": 1,
+          "options": {
+            "async": {
+              "label": "List Modules",
+              "action": "listModules"
+            }
+          },
+          "items": {
+            "enum": [],
+            "type": "string"
+          },
+          "enum": []
+        },
+        "field_names": {
+          "type": "array",
+          "format": "select",
+          "title": "Fields (optional)",
+          "description": "List of field names to be downloaded",
+          "propertyOrder": 2,
+          "options": {
+            "async": {
+              "label": "List Fields",
+              "action": "listFields"
+            }
+          },
+          "items": {
+            "enum": [],
+            "type": "string"
+          },
+          "uniqueItems": true
+        }
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "propertyOrder": 1
+    },
+    "sync_options": {
+      "type": "object",
+      "title": "Sync Options",
+      "propertyOrder": 2,
+      "properties": {
+        "sync_mode": {
+          "type": "string",
+          "required": true,
+          "title": "Sync Mode",
+          "enum": [
+            "full_sync",
+            "incremental_sync",
+            "advanced"
+          ],
+          "options": {
+            "enum_titles": [
+              "Full Sync",
+              "Incremental Sync",
+              "Advanced"
+            ]
+          },
+          "default": "full_sync",
+          "description": "Full Sync downloads all data from the source every run, Incremental Sync downloads data created or updated in a specified time range and Advanced option enables custom filtering.",
+          "propertyOrder": 10
+        },
+        "incremental_field": {
+          "type": "string",
+          "title": "Incremental Field",
+          "description": "Field/column to be used for incremental fetching",
+          "propertyOrder": 20,
+          "options": {
+            "async": {
+              "label": "List DateTime Fields",
+              "action": "listFieldsDatetime"
+            },
+            "dependencies": {
+              "sync_mode": "incremental_sync"
+            }
+          },
+          "items": {
+            "enum": [],
+            "type": "string"
+          },
+          "enum": []
+        },
+        "operator": {
+          "type": "string",
+          "title": "Operator",
+          "default": "less_equal",
+          "description": "The operator you want to use to filter the field.",
+          "propertyOrder": 30,
+          "enum": [
+            "greater_than",
+            "greater_equal",
+            "less_than",
+            "less_equal"
+          ],
+          "options": {
+            "dependencies": {
+              "sync_mode": "incremental_sync"
+            },
+            "enum_titles": [
+              "Greater than",
+              "Greater than or equal to",
+              "Less than",
+              "Less than or equal to"
+            ]
+          }
+        },
+        "value": {
+          "type": "string",
+          "title": "Value",
+          "default": "now",
+          "description": "Either date in YYYY-MM-DD format or dateparser string i.e. 5 days ago, 1 month ago, last_run, now, etc.",
+          "propertyOrder": 40,
+          "options": {
+            "dependencies": {
+              "sync_mode": "incremental_sync"
+            }
+          }
+        },
+        "filtering_criteria": {
+          "type": "object",
+          "title": "Filtering Criteria",
+          "format": "editor",
+          "description": "Filtering criteria is either a single filtering criterion or a filtering criteria group. For more information, visit the <a href='https://bitbucket.org/kds_consulting_team/kds-team.ex-zoho/src/master/README.md'>Component's documentation</a>.",
+          "propertyOrder": 50,
+          "options": {
+            "dependencies": {
+              "sync_mode": "advanced"
+            }
+          }
+        }
+      }
+    },
+    "destination": {
+      "title": "Destination settings",
+      "type": "object",
+      "required": [
+        "output_table_name"
+      ],
+      "propertyOrder": 3,
+      "properties": {
+        "load_mode": {
+          "title": "Load mode",
+          "type": "string",
+          "enum": [
+            "full",
+            "incremental"
+          ],
+          "options": {
+            "enum_titles": [
+              "Full",
+              "Incremental"
+            ]
+          },
+          "propertyOrder": 3
+        },
+        "output_table_name": {
+          "title": "Output table name (Optional)",
+          "type": "string",
+          "minLength": 1,
+          "propertyOrder": 1
+        }
+      }
+    }
+  }
 }

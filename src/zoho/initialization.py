@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Literal
 
 from zcrmsdk.src.com.zoho.crm.api.user_signature import UserSignature
 from zcrmsdk.src.com.zoho.crm.api.dc import (
@@ -46,15 +45,13 @@ def get_filestore_file(file_store_path: Path):
 
 
 def initialize(
-    region_code: Literal["EU", "US", "CN", "IN", "AU", "JP"],
-    client_id: str,
-    client_secret: str,
-    grant_token: str,
-    user_email: str,
-    tmp_dir_path: Path,
-    file_store_path: Path,
-):
-
+        region_code: str,
+        refresh_token: str,
+        client_id: str,
+        client_secret: str,
+        user_email: str,
+        tmp_dir_path: Path,
+        file_store_path: Path):
     """
     Create an instance of Logger Class that takes two parameters
     1 -> Level of the log messages to be logged.
@@ -89,7 +86,7 @@ def initialize(
     token = OAuthToken(
         client_id=client_id,
         client_secret=client_secret,
-        grant_token=grant_token,
+        refresh_token=refresh_token
     )
 
     """
@@ -123,8 +120,8 @@ def initialize(
     config = SDKConfig(
         auto_refresh_fields=True,
         pick_list_validation=False,
-        connect_timeout=None,
-        read_timeout=None,
+        connect_timeout=60,
+        read_timeout=60,
     )
 
     """

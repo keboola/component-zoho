@@ -206,7 +206,6 @@ class ZohoCRMExtractor(ComponentBase):
         load_mode: str = params.get(KEY_GROUP_DESTINATION, {}).get(KEY_LOAD_MODE, "full_load")
         self.incremental: bool = load_mode == "incremental"
 
-
         # Create directory for temporary data (Zoho SDK logging and token store)
         data_dir_path = Path(self.data_folder_path)
         self.tmp_dir_path = data_dir_path / TMP_DATA_DIR_NAME

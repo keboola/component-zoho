@@ -173,7 +173,8 @@ class ZohoCRMExtractor(ComponentBase):
                 file_store_path=self.token_store_path,
             )
         except Exception as e:
-            raise UserException("Zoho Python SDK initialization failed.\nReason:\n" + str(e)) from e
+            raise UserException(f"Zoho Python SDK initialization failed.\nReason:\n + {str(e)}\n"
+                                f"The component only supports {REGION_CODE} stack.") from e
 
     def _init_params(self):
         params: dict = self.configuration.parameters

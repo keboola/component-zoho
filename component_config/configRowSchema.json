@@ -38,7 +38,10 @@
           "options": {
             "async": {
               "label": "List Fields",
-              "action": "listFields"
+              "action": "listFields",
+              "autoload": [
+                  "parameters.module_name"
+                ]
             }
           },
           "items": {

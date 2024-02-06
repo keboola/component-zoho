@@ -20,7 +20,8 @@
           "options": {
             "async": {
               "label": "List Modules",
-              "action": "listModules"
+              "action": "listModules",
+              "autoload": []
             }
           },
           "items": {

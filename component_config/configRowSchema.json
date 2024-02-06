@@ -20,7 +20,8 @@
           "options": {
             "async": {
               "label": "List Modules",
-              "action": "listModules"
+              "action": "listModules",
+              "autoload": []
             }
           },
           "items": {
@@ -38,7 +39,10 @@
           "options": {
             "async": {
               "label": "List Fields",
-              "action": "listFields"
+              "action": "listFields",
+              "autoload": [
+                  "parameters.module_name"
+                ]
             }
           },
           "items": {

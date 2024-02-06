@@ -41,7 +41,7 @@
               "label": "List Fields",
               "action": "listFields",
               "autoload": [
-                  "parameters.module_name"
+                  "parameters.module_records_download_config.module_name"
                 ]
             }
           },

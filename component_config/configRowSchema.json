@@ -19,6 +19,7 @@
           "propertyOrder": 1,
           "options": {
             "async": {
+              "cache": false,
               "label": "List Modules",
               "action": "listModules",
               "autoload": []
@@ -38,6 +39,7 @@
           "propertyOrder": 2,
           "options": {
             "async": {
+              "cache": false,
               "label": "List Fields",
               "action": "listFields",
               "autoload": [

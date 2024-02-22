@@ -21,8 +21,7 @@
             "async": {
               "cache": false,
               "label": "List Modules",
-              "action": "listModules",
-              "autoload": []
+              "action": "listModules"
             }
           },
           "items": {
@@ -42,9 +41,6 @@
               "cache": false,
               "label": "List Fields",
               "action": "listFields",
-              "autoload": [
-                  "parameters.module_records_download_config.module_name"
-                ]
             }
           },
           "items": {

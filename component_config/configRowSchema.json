@@ -156,9 +156,6 @@
     "destination": {
       "title": "Destination settings",
       "type": "object",
-      "required": [
-        "output_table_name"
-      ],
       "propertyOrder": 3,
       "properties": {
         "load_mode": {

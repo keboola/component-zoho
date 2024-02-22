@@ -40,7 +40,7 @@
             "async": {
               "cache": false,
               "label": "List Fields",
-              "action": "listFields",
+              "action": "listFields"
             }
           },
           "items": {

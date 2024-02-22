@@ -9,13 +9,30 @@
       "title": "Account",
       "type": "object",
       "required": [
-        "user_email"
+        "user_email",
+        "zoho_datacenter"
       ],
       "propertyOrder": 1,
       "properties": {
         "user_email": {
           "title": "User email",
-          "type": "string"
+          "type": "string",
+          "propertyOrder": 1
+        },
+        "zoho_datacenter": {
+          "title": "Zoho Datacenter",
+          "type": "string",
+          "enum": [
+            "COM",
+            "EU",
+            "IN",
+            "AU",
+            "JP",
+            "UK",
+            "CA"
+          ],
+          "default": "COM",
+          "propertyOrder": 2
         }
       }
     }

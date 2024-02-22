@@ -25,6 +25,7 @@ from zcrmsdk.src.com.zoho.crm.api import ParameterMap
 # Configuration variables
 KEY_GROUP_ACCOUNT = "account"
 KEY_USER_EMAIL = "user_email"
+KEY_DATACENTER = "zoho_datacenter"
 KEY_GROUP_DESTINATION = "destination"
 KEY_LOAD_MODE = "load_mode"
 KEY_MODULE_RECORDS_DOWNLOAD_CONFIG = "module_records_download_config"
@@ -40,7 +41,6 @@ KEY_FILTERING_CRITERIA = "filtering_criteria"
 REQUIRED_PARAMETERS = [KEY_MODULE_RECORDS_DOWNLOAD_CONFIG, KEY_GROUP_SYNC_OPTIONS]
 
 # Other constants
-REGION_CODE = "EU"
 TMP_DATA_DIR_NAME = "tmp_data"
 TOKEN_STORE_FILE_NAME = "token_store.csv"
 ID_COLUMN_NAME = "Id"
@@ -72,7 +72,8 @@ class ZohoCRMExtractor(ComponentBase):
         asks Zoho API to prepare the data for download and then downloads the data as sliced CSV.
         Also creates appropriate manifest files.
         """
-        module_name: str = config[KEY_MODULE_NAME]
+        datacenter: str = config.get(KEY_DATACENTER)
+        module_name: str = config.get(KEY_MODULE_NAME)
         field_names: Optional[List[str]] = config.get(KEY_FIELD_NAMES)
 
         filtering_criteria = None
@@ -167,14 +168,13 @@ class ZohoCRMExtractor(ComponentBase):
                 client_id=self.client_id,
                 client_secret=self.client_secret,
                 refresh_token=self.refresh_token,
-                region_code=REGION_CODE,
+                region_code=self.zoho_datacenter,
                 user_email=self.user_email,
                 tmp_dir_path=self.tmp_dir_path,
                 file_store_path=self.token_store_path,
             )
         except Exception as e:
-            raise UserException(f"Zoho Python SDK initialization failed.\nReason:\n + {str(e)}\n"
-                                f"The component only supports {REGION_CODE} stack.") from e
+            raise UserException(f"Zoho Python SDK initialization failed.\nReason:\n + {str(e)}") from e
 
     def _init_params(self):
         params: dict = self.configuration.parameters
@@ -200,6 +200,10 @@ class ZohoCRMExtractor(ComponentBase):
         self.user_email: str = params.get(KEY_GROUP_ACCOUNT, {}).get(KEY_USER_EMAIL)
         if not self.user_email:
             raise UserException("Parameter user_email is mandatory.")
+
+        self.zoho_datacenter: str = params.get(KEY_GROUP_ACCOUNT, {}).get(KEY_DATACENTER)
+        if not self.zoho_datacenter:
+            raise UserException("Parameter zoho_datacenter is mandatory.")
 
         sync_options = params.get(KEY_GROUP_SYNC_OPTIONS)
         self.filtering_criteria_dict = self._set_filters(sync_options)

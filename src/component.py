@@ -72,7 +72,6 @@ class ZohoCRMExtractor(ComponentBase):
         asks Zoho API to prepare the data for download and then downloads the data as sliced CSV.
         Also creates appropriate manifest files.
         """
-        datacenter: str = config.get(KEY_DATACENTER)
         module_name: str = config.get(KEY_MODULE_NAME)
         field_names: Optional[List[str]] = config.get(KEY_FIELD_NAMES)
 

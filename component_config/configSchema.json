@@ -23,12 +23,12 @@
           "title": "Zoho Datacenter",
           "type": "string",
           "enum": [
-            "US",
             "EU",
+            "US",
+            "UK",
             "IN",
             "AU",
             "JP",
-            "UK",
             "CA"
           ],
           "default": "COM",

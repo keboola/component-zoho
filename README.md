@@ -11,11 +11,6 @@ Functionality notes
 ===================
 Extracts data about Zoho CRM modules using the [Bulk Read APIs](https://www.zoho.com/crm/developer/docs/api/v2/bulk-read/overview.html).
 
-Prerequisites
-=============
-You must log into the the Zoho API console of your regional Zoho data center and register a new Self Client to obtain the needed credentials. You must then generate a grant token there with scope of at least `ZohoCRM.modules.READ,ZohoCRM.bulk.READ`. See [the offical documentation](https://www.zoho.com/crm/developer/docs/api/v2/auth-request.html#self-client) for details.
-
-
 Supported endpoints
 ===================
 - `crm/bulk/v2/read`

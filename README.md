@@ -24,7 +24,6 @@ Configuration
 =============
 
  - Account's user email (user_email) - [REQ] User email you used to generate the Self Client.
- - Load mode (load_mode) - [REQ] Keboola Connection table load mode.
  - Module records download configuration (module_records_download_config) - [REQ] job configuration
     - Module name (module_name) [REQ] - The API name of the Zoho CRM module you want to extract records from.
     - Field names (field_names) [OPT] - API names of the module records' fields you want to extract. Can be left empty or omitted to download all available fields.

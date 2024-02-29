@@ -1,3 +1,1 @@
-Zoho CRM extractor using bulk read operations of the v2 API. To obtain the neccessary credentials:
-
-You must log into the the Zoho API console of your regional Zoho data center and register a new Self Client to obtain the needed credentials. You must then generate a grant token there with scope of at least `ZohoCRM.modules.READ,ZohoCRM.bulk.READ`. See [the offical documentation](https://www.zoho.com/crm/developer/docs/api/v2/auth-request.html#self-client) for details.
+Extracts data about Zoho CRM modules using the [Bulk Read APIs](https://www.zoho.com/crm/developer/docs/api/v2/bulk-read/overview.html).

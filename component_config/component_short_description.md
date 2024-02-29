@@ -1,1 +1,1 @@
-Zoho CRM extractor using bulk read operations of the v2 API.
+Zoho CRM's free tool helps you create, manage, and organize data in a way that drives sales and revenue.

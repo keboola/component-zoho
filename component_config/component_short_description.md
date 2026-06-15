@@ -1,1 +1,1 @@
-Zoho CRM's free tool helps you create, manage, and organize data in a way that drives sales and revenue.
+Extracts Zoho CRM module records.

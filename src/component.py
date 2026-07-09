@@ -181,9 +181,9 @@ class ZohoCRMExtractor(ComponentBase):
 
         output_table_name = params.get(KEY_GROUP_DESTINATION, {}).get(KEY_OUTPUT_TABLE_NAME)
         if not output_table_name:
-            default_table_name = self.module_records_download_config.get(KEY_MODULE_NAME)
-            logging.info(f"Custom output table name not set, defaulting to module name: {default_table_name}")
-            self.output_table_name = default_table_name
+            output_table_name = self.module_records_download_config.get(KEY_MODULE_NAME)
+            logging.info(f"Custom output table name not set, defaulting to module name: {output_table_name}")
+        self.output_table_name = output_table_name
 
         oauth_credentials = self.configuration.oauth_credentials.data
         if not oauth_credentials:

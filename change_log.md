@@ -1,3 +1,7 @@
+**1.0.12**
+
+- fix: honor custom `destination.output_table_name` (previously ignored, output landed in a table named `None`)
+
 **0.1.1**
 
 - fix requirements
